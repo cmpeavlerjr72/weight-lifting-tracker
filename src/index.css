@@ -190,4 +190,13 @@ select.select option:disabled {
   color: rgba(255,255,255,0.55);
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+input {
+  font-size: 16px;
+}
+
+
 

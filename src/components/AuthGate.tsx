@@ -18,14 +18,14 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (!session) {
         if (active) {
           setReady(true)
-          if (loc.pathname !== '/login') nav('/login')
+          if (loc.pathname !== '/') nav('/')
         }
         return
       }
 
       // Logged in: enforce onboarding order
       // Allow /login to show (optional) but we will redirect away
-      if (loc.pathname === '/login') {
+      if (loc.pathname === '/') {
         nav('/setup/team')
       }
 

@@ -8,7 +8,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   async function logout() {
     await supabase.auth.signOut()
-    nav('/login')
+    nav('/')
   }
 
   return (
