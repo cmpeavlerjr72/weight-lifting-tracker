@@ -27,7 +27,7 @@ export default function SetupTeam() {
       const { error } = await supabase.from('teams').update({ name }).eq('id', existingTeamId)
       setBusy(false)
       if (error) return alert(error.message)
-      nav('/setup/roster')
+      nav('/coach/setup/roster')
       return
     }
 
@@ -39,7 +39,7 @@ export default function SetupTeam() {
 
     setBusy(false)
     if (error) return alert(error.message)
-    nav('/setup/roster')
+    nav('/coach/setup/roster')
   }
 
   return (

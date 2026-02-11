@@ -22,9 +22,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="right row" style={{ gap: 10 }}>
-            <Link className="button" to="/setup/team">Team</Link>
-            <Link className="button" to="/setup/roster">Roster</Link>
-            <Link className="button" to="/setup/rfid">RFID</Link>
+            <Link className="button" to="/coach/dashboard">Dashboard</Link>
+            <Link className="button" to="/coach/setup/team">Team</Link>
+            <Link className="button" to="/coach/setup/roster">Roster</Link>
+            <Link className="button" to="/coach/setup/rfid">RFID</Link>
             <button className="button" onClick={logout}>Logout</button>
           </div>
         </div>

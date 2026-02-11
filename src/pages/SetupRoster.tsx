@@ -236,7 +236,7 @@ export default function SetupRoster() {
           </button>
 
 
-          <button className="button buttonPrimary" onClick={() => nav('/setup/rfid')} disabled={!canContinue}>
+          <button className="button buttonPrimary" onClick={() => nav('/coach/setup/rfid')} disabled={!canContinue}>
             Continue to RFID
           </button>
         </div>

@@ -14,7 +14,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setBusy(false)
     if (error) return alert(error.message)
-    nav('/setup/team')
+    nav('/coach/dashboard')
   }
 
   async function signup() {

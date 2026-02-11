@@ -32,10 +32,10 @@ export const router = createBrowserRouter([
   // Coach routes (existing)
   { path: '/', element: <Shell page={<RoleSelect />} /> },
   { path: '/coach/login', element: <Login /> },
-  { path: '/setup/team', element: <Shell page={<SetupTeam />} /> },
-  { path: '/setup/roster', element: <Shell page={<SetupRoster />} /> },
-  { path: '/setup/rfid', element: <Shell page={<SetupRFID />} /> },
-  { path: '/dashboard', element: <Shell page={<Dashboard />} /> },
+  { path: '/coach/setup/team', element: <Shell page={<SetupTeam />} /> },
+  { path: '/coach/setup/roster', element: <Shell page={<SetupRoster />} /> },
+  { path: '/coach/setup/rfid', element: <Shell page={<SetupRFID />} /> },
+  { path: '/coach/dashboard', element: <Shell page={<Dashboard />} /> },
 
   // Player routes (NEW)
   { path: '/player/login', element: <PlayerLoginPage /> },
