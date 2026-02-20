@@ -194,9 +194,10 @@ export default function VbtDataPage() {
                                   <tr>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Rep</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Mean Vel</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Peak Vel</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc Vel (up)</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc Accel (up)</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc Vel (down)</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc Accel (down)</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -220,10 +221,15 @@ export default function VbtDataPage() {
                                             ? `${toFps(r.ecc_peak_velocity)} ft/s`
                                             : '—'}
                                         </td>
+                                        <td style={{ padding: '4px 10px' }}>
+                                          {r.ecc_peak_accel != null
+                                            ? `${(r.ecc_peak_accel * MPS_TO_FPS).toFixed(2)} ft/s²`
+                                            : '—'}
+                                        </td>
                                       </tr>
                                       {r.samples && r.samples.length >= 2 && (
                                         <tr key={r.id + '-curve'}>
-                                          <td colSpan={5} style={{ padding: '4px 10px', textAlign: 'center' }}>
+                                          <td colSpan={6} style={{ padding: '4px 10px', textAlign: 'center' }}>
                                             <VelocityCurve samples={r.samples} />
                                           </td>
                                         </tr>

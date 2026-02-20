@@ -37,6 +37,7 @@ export type VbtRep = {
   bar_path_deviation: number | null
   conc_peak_accel: number | null
   ecc_peak_velocity: number | null
+  ecc_peak_accel: number | null
   flagged: boolean
   flag_reason: string | null
   samples: VelSample[]
