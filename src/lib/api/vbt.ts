@@ -59,6 +59,11 @@ export type VbtSetSummary = {
   created_at: string
 }
 
+export type VbtLeaderboardSet = VbtSetSummary & {
+  avg_conc_accel: number | null
+  avg_ecc_accel: number | null
+}
+
 // ── Queries ──
 
 /** Fetch recent set summaries for a player. */
@@ -91,6 +96,15 @@ export async function listTeamSetSummaries(
   limit = 50,
 ): Promise<VbtSetSummary[]> {
   const res = await authFetch(`/teams/${teamId}/vbt/set-summaries?limit=${limit}`)
+  return res.json()
+}
+
+/** Fetch set summaries for a team with averaged rep-level accel metrics. */
+export async function listTeamLeaderboardSets(
+  teamId: string,
+  limit = 200,
+): Promise<VbtLeaderboardSet[]> {
+  const res = await authFetch(`/teams/${teamId}/vbt/leaderboard-sets?limit=${limit}`)
   return res.json()
 }
 
