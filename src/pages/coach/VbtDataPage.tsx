@@ -66,6 +66,9 @@ export default function VbtDataPage() {
     }
   }
 
+  const MPS_TO_FPS = 3.28084
+  const toFps = (v: number) => (v * MPS_TO_FPS).toFixed(2)
+
   const selectedPlayer = players.find((p) => p.id === selectedPlayerId)
 
   if (!teamId) {
@@ -124,7 +127,6 @@ export default function VbtDataPage() {
                   <th>Reps</th>
                   <th>Avg Vel</th>
                   <th>Peak Vel</th>
-                  <th>Vel Loss</th>
                   <th></th>
                 </tr>
               </thead>
@@ -149,17 +151,8 @@ export default function VbtDataPage() {
                         </td>
                         <td style={{ fontWeight: 600 }}>{s.exercise}</td>
                         <td>{s.rep_count}</td>
-                        <td style={{ fontWeight: 700 }}>{s.avg_velocity.toFixed(3)} m/s</td>
-                        <td>{s.peak_velocity.toFixed(3)} m/s</td>
-                        <td>
-                          {s.velocity_loss != null ? (
-                            <span style={{ color: s.velocity_loss > 20 ? '#ef4444' : 'inherit' }}>
-                              {s.velocity_loss.toFixed(1)}%
-                            </span>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
+                        <td style={{ fontWeight: 700 }}>{toFps(s.avg_velocity)} ft/s</td>
+                        <td>{toFps(s.peak_velocity)} ft/s</td>
                         <td style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span className="small">{isOpen ? '▲' : '▼'}</span>
                           <button
@@ -184,7 +177,7 @@ export default function VbtDataPage() {
 
                       {isOpen && (
                         <tr key={s.id + '-reps'}>
-                          <td colSpan={7} style={{ padding: 0 }}>
+                          <td colSpan={6} style={{ padding: 0 }}>
                             {!setReps ? (
                               <div className="small" style={{ padding: 12 }}>Loading reps...</div>
                             ) : setReps.length === 0 ? (
@@ -202,9 +195,8 @@ export default function VbtDataPage() {
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Rep</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Mean Vel</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Peak Vel</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>ROM</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc (up)</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc (down)</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -213,15 +205,10 @@ export default function VbtDataPage() {
                                       <tr key={r.id}>
                                         <td style={{ padding: '4px 10px' }}>{r.rep_number}</td>
                                         <td style={{ padding: '4px 10px', fontWeight: 700 }}>
-                                          {r.mean_velocity.toFixed(3)} m/s
+                                          {toFps(r.mean_velocity)} ft/s
                                         </td>
                                         <td style={{ padding: '4px 10px' }}>
-                                          {r.peak_velocity.toFixed(3)} m/s
-                                        </td>
-                                        <td style={{ padding: '4px 10px' }}>
-                                          {r.rom_meters != null
-                                            ? `${(r.rom_meters * 100).toFixed(1)} cm`
-                                            : '—'}
+                                          {toFps(r.peak_velocity)} ft/s
                                         </td>
                                         <td style={{ padding: '4px 10px' }}>
                                           {r.concentric_duration != null
@@ -236,7 +223,7 @@ export default function VbtDataPage() {
                                       </tr>
                                       {r.samples && r.samples.length >= 2 && (
                                         <tr key={r.id + '-curve'}>
-                                          <td colSpan={6} style={{ padding: '4px 10px' }}>
+                                          <td colSpan={5} style={{ padding: '4px 10px' }}>
                                             <VelocityCurve samples={r.samples} />
                                           </td>
                                         </tr>

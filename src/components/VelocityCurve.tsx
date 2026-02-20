@@ -19,7 +19,8 @@ export default function VelocityCurve({ samples, width = 400, height = 120 }: Pr
   const plotW = width - pad.left - pad.right
   const plotH = height - pad.top - pad.bottom
 
-  const velocities = samples.map((s) => s.v)
+  const MPS_TO_FPS = 3.28084
+  const velocities = samples.map((s) => s.v * MPS_TO_FPS)
   const minV = Math.min(...velocities)
   const maxV = Math.max(...velocities)
   const vRange = maxV - minV || 0.001
@@ -31,13 +32,13 @@ export default function VelocityCurve({ samples, width = 400, height = 120 }: Pr
   const toX = (t: number) => pad.left + ((t - minT) / tRange) * plotW
   const toY = (v: number) => pad.top + plotH - ((v - minV) / vRange) * plotH
 
-  // Build polyline points
-  const points = samples.map((s) => `${toX(s.t).toFixed(1)},${toY(s.v).toFixed(1)}`).join(' ')
+  // Build polyline points (convert to ft/s for display)
+  const points = samples.map((s, i) => `${toX(s.t).toFixed(1)},${toY(velocities[i]).toFixed(1)}`).join(' ')
 
   // Gradient stops — map each sample's velocity to a color
   const gradientId = `vel-grad-${Math.random().toString(36).slice(2, 8)}`
   const stops = samples.map((s, i) => {
-    const ratio = (s.v - minV) / vRange
+    const ratio = (velocities[i] - minV) / vRange
     const r = Math.round(139 * (1 - ratio))
     const g = Math.round(100 * ratio)
     const offset = (i / (samples.length - 1)) * 100
@@ -119,7 +120,7 @@ export default function VelocityCurve({ samples, width = 400, height = 120 }: Pr
 
       {/* Y-axis label */}
       <text x={4} y={pad.top + plotH / 2} fontSize={8} fill="#666" transform={`rotate(-90, 4, ${pad.top + plotH / 2})`} textAnchor="middle">
-        m/s
+        ft/s
       </text>
     </svg>
   )
