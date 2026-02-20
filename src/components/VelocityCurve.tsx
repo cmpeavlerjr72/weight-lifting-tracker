@@ -60,7 +60,7 @@ export default function VelocityCurve({ samples, width = 400, height = 120 }: Pr
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      style={{ display: 'block', maxWidth: '100%' }}
+      style={{ display: 'block', maxWidth: '100%', margin: '0 auto' }}
     >
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">

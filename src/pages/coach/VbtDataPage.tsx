@@ -223,7 +223,7 @@ export default function VbtDataPage() {
                                       </tr>
                                       {r.samples && r.samples.length >= 2 && (
                                         <tr key={r.id + '-curve'}>
-                                          <td colSpan={5} style={{ padding: '4px 10px' }}>
+                                          <td colSpan={5} style={{ padding: '4px 10px', textAlign: 'center' }}>
                                             <VelocityCurve samples={r.samples} />
                                           </td>
                                         </tr>
