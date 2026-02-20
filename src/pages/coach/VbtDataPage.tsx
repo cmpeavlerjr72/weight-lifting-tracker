@@ -195,8 +195,8 @@ export default function VbtDataPage() {
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Rep</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Mean Vel</th>
                                     <th style={{ padding: '6px 10px', fontSize: 11 }}>Peak Vel</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc (up)</th>
-                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc (down)</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Conc Accel (up)</th>
+                                    <th style={{ padding: '6px 10px', fontSize: 11 }}>Ecc Vel (down)</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -211,13 +211,13 @@ export default function VbtDataPage() {
                                           {toFps(r.peak_velocity)} ft/s
                                         </td>
                                         <td style={{ padding: '4px 10px' }}>
-                                          {r.concentric_duration != null
-                                            ? `${r.concentric_duration.toFixed(0)} ms`
+                                          {r.conc_peak_accel != null
+                                            ? `${(r.conc_peak_accel * MPS_TO_FPS).toFixed(2)} ft/s²`
                                             : '—'}
                                         </td>
                                         <td style={{ padding: '4px 10px' }}>
-                                          {r.eccentric_duration != null
-                                            ? `${r.eccentric_duration.toFixed(0)} ms`
+                                          {r.ecc_peak_velocity != null
+                                            ? `${toFps(r.ecc_peak_velocity)} ft/s`
                                             : '—'}
                                         </td>
                                       </tr>
