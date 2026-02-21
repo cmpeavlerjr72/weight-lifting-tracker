@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { EXERCISE_CATALOG } from '../constants/exercises'
+import { EXERCISE_CATALOG, type CatalogExercise } from '../constants/exercises'
 import {
   getExerciseLeaderboard,
   getTeamLiveActivity,
@@ -32,7 +32,7 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   const [tab, setTab] = useState<Tab>('leaderboards')
 
   // Leaderboard state
-  const [selectedExercise, setSelectedExercise] = useState(EXERCISE_CATALOG[0])
+  const [selectedExercise, setSelectedExercise] = useState<CatalogExercise>(EXERCISE_CATALOG[0])
   const [positionFilter, setPositionFilter] = useState<'all' | PositionGroup>('all')
   const [metric, setMetric] = useState<'peak_velocity' | 'avg_velocity' | 'est_1rm'>('peak_velocity')
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])

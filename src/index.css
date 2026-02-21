@@ -1014,41 +1014,113 @@ input {
   gap: 4px;
 }
 
-/* Calendar grid (6-column week view) */
-.calendarGrid {
+/* Calendar month grid (7-column) */
+.calMonthGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-}
-
-.calendarDay {
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 10px;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 
-.calendarDayHeader {
-  display: flex;
-  justify-content: space-between;
+.calMonthDayLabel {
+  padding: 8px 0;
+  text-align: center;
+  font-size: 12px;
   font-weight: 700;
-  font-size: 13px;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  background: rgba(0,0,0,0.15);
 }
 
-.calendarCard {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px;
+.calMonthCell {
+  min-height: 100px;
+  padding: 6px;
+  background: var(--card);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  position: relative;
+}
+
+.calMonthCellDimmed {
+  opacity: 0.35;
+}
+
+.calMonthCellToday {
+  background: rgba(96, 165, 250, 0.06);
+}
+
+.calMonthCellHeader {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.calMonthTodayBadge {
+  background: rgba(96, 165, 250, 0.8);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calMonthCellBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.calMonthEvent {
+  display: flex;
+  flex-direction: column;
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.calMonthEvent:hover {
+  background: rgba(231, 76, 60, 0.15);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.calMonthAddBtn {
+  margin-top: auto;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  padding: 2px 0;
+}
+
+.calMonthCell:hover .calMonthAddBtn {
+  opacity: 0.5;
+}
+
+.calMonthAddBtn:hover {
+  opacity: 1 !important;
+}
+
+.calMonthAddForm {
+  margin-top: auto;
+  padding: 4px;
+  border-top: 1px solid var(--border);
 }
 
 /* Template list */
@@ -1075,7 +1147,8 @@ input {
   .teamGrid { grid-template-columns: 1fr; }
   .liveGrid { grid-template-columns: 1fr; }
   .displayModeGrid { grid-template-columns: 1fr; }
-  .calendarGrid { grid-template-columns: repeat(3, 1fr); }
+  .calMonthGrid { font-size: 11px; }
+  .calMonthCell { min-height: 70px; }
   .metricGrid { grid-template-columns: repeat(2, 1fr); }
 }
 

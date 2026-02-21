@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import HubLayout from './HubLayout'
 import {
@@ -119,7 +119,7 @@ export default function HubProgramsPage() {
   const { teamId } = useParams<{ teamId: string }>()
 
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([])
-  const [players, setPlayers] = useState<Player[]>([])
+  const [, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState('')
 

@@ -1,18 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import HubLayout from './HubLayout'
-import { listTeamAssignments, listCoachTemplates, createAssignment, deleteTemplate } from '../../lib/api/workouts'
+import { listTeamAssignments, listCoachTemplates, createAssignment } from '../../lib/api/workouts'
 import type { WorkoutAssignment, WorkoutTemplate, TargetType, PositionGroup } from '../../types/database'
 import { authFetch } from '../../lib/api/client'
-
-function startOfWeek(d: Date): Date {
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day // Monday start
-  const monday = new Date(d)
-  monday.setDate(d.getDate() + diff)
-  monday.setHours(0, 0, 0, 0)
-  return monday
-}
 
 function addDays(d: Date, n: number): Date {
   const r = new Date(d)
@@ -20,27 +11,47 @@ function addDays(d: Date, n: number): Date {
   return r
 }
 
-function formatShortDate(d: Date): string {
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
 function dateKey(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  // Use local date to avoid timezone shifts
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
-const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+/** Get all calendar cells for a month view (includes leading/trailing days to fill the grid). */
+function getMonthGrid(year: number, month: number): Date[] {
+  const first = new Date(year, month, 1)
+  const startDow = first.getDay() // 0=Sun
+  const start = addDays(first, -startDow) // back up to Sunday
+
+  const cells: Date[] = []
+  // Always show 6 rows (42 cells) so the grid height stays consistent
+  for (let i = 0; i < 42; i++) {
+    cells.push(addDays(start, i))
+  }
+  return cells
+}
 
 export default function HubCalendarPage() {
   const { teamId } = useParams<{ teamId: string }>()
 
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
+  const now = new Date()
+  const [viewYear, setViewYear] = useState(now.getFullYear())
+  const [viewMonth, setViewMonth] = useState(now.getMonth()) // 0-indexed
   const [assignments, setAssignments] = useState<WorkoutAssignment[]>([])
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState('')
 
   // Add modal
-  const [addDay, setAddDay] = useState<string | null>(null) // date key
+  const [addDay, setAddDay] = useState<string | null>(null)
   const [addTemplateId, setAddTemplateId] = useState('')
   const [addTargetType, setAddTargetType] = useState<TargetType>('team')
   const [addTargetGroup, setAddTargetGroup] = useState<PositionGroup>('skill')
@@ -65,8 +76,24 @@ export default function HubCalendarPage() {
 
   useEffect(() => { loadAll() }, [teamId])
 
-  // Group assignments by due_at date key
-  const days: Date[] = DAY_LABELS.map((_, i) => addDays(weekStart, i))
+  const cells = getMonthGrid(viewYear, viewMonth)
+  const todayKey = dateKey(new Date())
+
+  function prevMonth() {
+    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11) }
+    else setViewMonth(m => m - 1)
+  }
+
+  function nextMonth() {
+    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0) }
+    else setViewMonth(m => m + 1)
+  }
+
+  function goToday() {
+    const n = new Date()
+    setViewYear(n.getFullYear())
+    setViewMonth(n.getMonth())
+  }
 
   function assignmentsForDay(day: Date): WorkoutAssignment[] {
     const key = dateKey(day)
@@ -100,7 +127,6 @@ export default function HubCalendarPage() {
       })
       setAddDay(null)
       setAddTemplateId('')
-      // Reload
       const updated = await listTeamAssignments(teamId)
       setAssignments(updated)
     } catch (e: any) {
@@ -118,95 +144,94 @@ export default function HubCalendarPage() {
     }
   }
 
-  const weekEnd = addDays(weekStart, 5)
-  const weekLabel = `${formatShortDate(weekStart)} - ${formatShortDate(weekEnd)}`
-
   return (
     <HubLayout>
       <div className="card">
         <div className="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
-          <div className="h1">Calendar</div>
+          <div className="h1">{MONTH_NAMES[viewMonth]} {viewYear}</div>
           <div className="row" style={{ gap: 8 }}>
-            <button className="button" onClick={() => setWeekStart(addDays(weekStart, -7))}>Prev</button>
-            <button className="button" onClick={() => setWeekStart(startOfWeek(new Date()))}>This Week</button>
-            <button className="button" onClick={() => setWeekStart(addDays(weekStart, 7))}>Next</button>
+            <button className="button" onClick={prevMonth}>Prev</button>
+            <button className="button" onClick={goToday}>Today</button>
+            <button className="button" onClick={nextMonth}>Next</button>
           </div>
         </div>
 
-        <div className="small" style={{ marginTop: 4, marginBottom: 12 }}>{weekLabel}</div>
+        <div style={{ height: 12 }} />
 
         {err && <div className="small" style={{ color: '#b00020', marginBottom: 12 }}>{err}</div>}
 
         {loading ? (
           <div className="small">Loading...</div>
         ) : (
-          <div className="calendarGrid">
-            {days.map((day, i) => {
-              const key = dateKey(day)
-              const dayAssignments = assignmentsForDay(day)
-              const isToday = dateKey(new Date()) === key
+          <>
+            {/* Day-of-week headers */}
+            <div className="calMonthGrid">
+              {DAY_LABELS.map(label => (
+                <div key={label} className="calMonthDayLabel">{label}</div>
+              ))}
 
-              return (
-                <div key={key} className="calendarDay" style={isToday ? { borderColor: 'rgba(96, 165, 250, 0.4)' } : undefined}>
-                  <div className="calendarDayHeader">
-                    <span>{DAY_LABELS[i]}</span>
-                    <span className="small">{formatShortDate(day)}</span>
-                  </div>
+              {cells.map(day => {
+                const key = dateKey(day)
+                const inMonth = day.getMonth() === viewMonth
+                const isToday = key === todayKey
+                const dayAssignments = assignmentsForDay(day)
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                    {dayAssignments.map(a => (
-                      <div key={a.id} className="calendarCard">
-                        <div style={{ fontWeight: 600, fontSize: 13 }}>{templateName(a.template_id)}</div>
-                        <div className="small">{targetLabel(a)}</div>
-                        <button
-                          className="button"
-                          style={{ padding: '2px 6px', fontSize: 11, marginTop: 4, alignSelf: 'flex-start' }}
-                          onClick={() => handleRemoveAssignment(a.id)}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Add button */}
-                  {addDay === key ? (
-                    <div style={{ padding: 8, border: '1px solid var(--border)', borderRadius: 8, background: 'rgba(0,0,0,0.15)', marginTop: 6 }}>
-                      <select className="select" value={addTemplateId} onChange={e => setAddTemplateId(e.target.value)} style={{ width: '100%', minWidth: 0, marginBottom: 6 }}>
-                        <option value="">Select template...</option>
-                        {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                      </select>
-                      <select className="select" value={addTargetType} onChange={e => setAddTargetType(e.target.value as TargetType)} style={{ width: '100%', minWidth: 0, marginBottom: 6 }}>
-                        <option value="team">Entire Team</option>
-                        <option value="position_group">Position Group</option>
-                      </select>
-                      {addTargetType === 'position_group' && (
-                        <select className="select" value={addTargetGroup} onChange={e => setAddTargetGroup(e.target.value as PositionGroup)} style={{ width: '100%', minWidth: 0, marginBottom: 6 }}>
-                          <option value="skill">Skill</option>
-                          <option value="combo">Combo</option>
-                          <option value="power">Power</option>
-                        </select>
-                      )}
-                      <div className="row" style={{ gap: 4 }}>
-                        <button className="button buttonPrimary" style={{ fontSize: 11, padding: '4px 8px' }} onClick={handleAddToDay} disabled={!addTemplateId}>
-                          Add
-                        </button>
-                        <button className="button" style={{ fontSize: 11, padding: '4px 8px' }} onClick={() => setAddDay(null)}>Cancel</button>
-                      </div>
+                return (
+                  <div
+                    key={key}
+                    className={`calMonthCell ${!inMonth ? 'calMonthCellDimmed' : ''} ${isToday ? 'calMonthCellToday' : ''}`}
+                  >
+                    <div className="calMonthCellHeader">
+                      <span className={isToday ? 'calMonthTodayBadge' : ''}>{day.getDate()}</span>
                     </div>
-                  ) : (
-                    <button
-                      className="button"
-                      style={{ width: '100%', marginTop: 6, padding: '4px 0', fontSize: 18, opacity: 0.4 }}
-                      onClick={() => { setAddDay(key); setAddTemplateId('') }}
-                    >
-                      +
-                    </button>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+
+                    <div className="calMonthCellBody">
+                      {dayAssignments.map(a => (
+                        <div key={a.id} className="calMonthEvent" onClick={() => handleRemoveAssignment(a.id)} title="Click to remove">
+                          <span style={{ fontWeight: 600 }}>{templateName(a.template_id)}</span>
+                          <span className="small" style={{ opacity: 0.7 }}>{targetLabel(a)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add button */}
+                    {inMonth && (
+                      addDay === key ? (
+                        <div className="calMonthAddForm">
+                          <select className="select" value={addTemplateId} onChange={e => setAddTemplateId(e.target.value)} style={{ width: '100%', minWidth: 0, marginBottom: 4, fontSize: 12, padding: '4px 6px' }}>
+                            <option value="">Template...</option>
+                            {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                          </select>
+                          <select className="select" value={addTargetType} onChange={e => setAddTargetType(e.target.value as TargetType)} style={{ width: '100%', minWidth: 0, marginBottom: 4, fontSize: 12, padding: '4px 6px' }}>
+                            <option value="team">Entire Team</option>
+                            <option value="position_group">Position Group</option>
+                          </select>
+                          {addTargetType === 'position_group' && (
+                            <select className="select" value={addTargetGroup} onChange={e => setAddTargetGroup(e.target.value as PositionGroup)} style={{ width: '100%', minWidth: 0, marginBottom: 4, fontSize: 12, padding: '4px 6px' }}>
+                              <option value="skill">Skill</option>
+                              <option value="combo">Combo</option>
+                              <option value="power">Power</option>
+                            </select>
+                          )}
+                          <div className="row" style={{ gap: 4 }}>
+                            <button className="button buttonPrimary" style={{ fontSize: 11, padding: '3px 6px' }} onClick={handleAddToDay} disabled={!addTemplateId}>Add</button>
+                            <button className="button" style={{ fontSize: 11, padding: '3px 6px' }} onClick={() => setAddDay(null)}>X</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          className="calMonthAddBtn"
+                          onClick={() => { setAddDay(key); setAddTemplateId('') }}
+                        >
+                          +
+                        </button>
+                      )
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
     </HubLayout>

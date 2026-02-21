@@ -172,7 +172,7 @@ export default function HubPlayerPage() {
   }
 
   // Find custom testing metrics not in presets
-  const presetNames = new Set(TESTING_PRESETS.map(p => p.name))
+  const presetNames = new Set<string>(TESTING_PRESETS.map(p => p.name))
   const customTests = testing.filter(t => !presetNames.has(t.metric_name))
 
   if (loading) {

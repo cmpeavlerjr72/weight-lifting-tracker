@@ -37,7 +37,7 @@ export default function VelocityCurve({ samples, width = 400, height = 120 }: Pr
 
   // Gradient stops — map each sample's velocity to a color
   const gradientId = `vel-grad-${Math.random().toString(36).slice(2, 8)}`
-  const stops = samples.map((s, i) => {
+  const stops = samples.map((_, i) => {
     const ratio = (velocities[i] - minV) / vRange
     const r = Math.round(139 * (1 - ratio))
     const g = Math.round(100 * ratio)

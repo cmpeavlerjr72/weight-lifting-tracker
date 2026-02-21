@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { usePlayerLink } from './PlayerLinkContext'
 import { writePlayerLinkCache } from './playerStorage'
-import { normalizeInviteCode, classifyClaimError } from '../../utils/invite'
+import { normalizeInviteCode } from '../../utils/invite'
 import { authFetch } from '../../lib/api/client'
 
 export default function PlayerClaimPage() {
