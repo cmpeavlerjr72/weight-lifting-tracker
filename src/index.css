@@ -107,13 +107,14 @@ a { color: inherit; text-decoration: none; }
   min-width: 0;
 }
 
-.colFirst { width: 18%; }
-.colLast { width: 20%; }
-.colJersey { width: 14%; }
-.colPos { width: 20%; }
-.colRfid { width: 14%; }
-.colActions { width: 14%; }
-.colInvite { width: 18%; }
+.colFirst { width: 14%; }
+.colLast { width: 16%; }
+.colJersey { width: 10%; }
+.colPos { width: 16%; }
+.colMaxes { width: 10%; }
+.colRfid { width: 10%; }
+.colInvite { width: 12%; }
+.colActions { width: 12%; }
 
 
 .buttonSuccess {
@@ -198,5 +199,883 @@ input {
   font-size: 16px;
 }
 
+/* ── Dashboard Layout ──────────────────────────────────────────────────── */
 
+.containerWide {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.dashboardStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Stats row */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.statCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.statLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.statSub {
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.statTrendUp { color: rgba(46, 204, 113, 0.9); }
+.statTrendDown { color: rgba(231, 76, 60, 0.9); }
+
+.colorGreen .statValue { color: rgba(46, 204, 113, 0.95); }
+.colorYellow .statValue { color: rgba(241, 196, 15, 0.95); }
+.colorRed .statValue { color: rgba(231, 76, 60, 0.95); }
+.colorBlue .statValue { color: rgba(96, 165, 250, 0.95); }
+
+/* Team overview cards */
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.teamCard {
+  cursor: pointer;
+  transition: transform 0.08s ease, border-color 0.15s ease;
+}
+
+.teamCard:hover {
+  border-color: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+.teamCardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.teamCardName {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.teamCardSport {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.teamCardStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Progress bar */
+.progressBar {
+  height: 8px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  background: rgba(46, 204, 113, 0.7);
+  transition: width 0.5s ease;
+}
+
+.progressFillWarn {
+  background: rgba(241, 196, 15, 0.7);
+}
+
+.progressFillDanger {
+  background: rgba(231, 76, 60, 0.7);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Two-column layout */
+.dashboardColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Section title */
+.sectionTitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+/* Activity feed */
+.feedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.feedItem {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedItem:last-child { border-bottom: none; }
+
+.feedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feedPlayer {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.feedTime {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.feedDetails {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.feedFlag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(231, 76, 60, 0.95);
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+/* Due workout items */
+.dueList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.dueItem {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.dueItem:last-child { border-bottom: none; }
+
+.dueHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.dueName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dueBadge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.dueBadgeUpcoming {
+  background: rgba(96, 165, 250, 0.12);
+  color: rgba(96, 165, 250, 0.95);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.dueBadgeOverdue {
+  background: rgba(231, 76, 60, 0.12);
+  color: rgba(231, 76, 60, 0.95);
+  border: 1px solid rgba(231, 76, 60, 0.25);
+}
+
+.dueMeta {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+/* ── Player Dashboard ──────────────────────────────────────────────────── */
+
+/* Today's workout */
+.todayCard {
+  border-color: rgba(96, 165, 250, 0.25);
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.06), rgba(96, 165, 250, 0.01));
+}
+
+.todayTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.exerciseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.exerciseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.exerciseRow:last-child { border-bottom: none; }
+
+.exerciseName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.exerciseMeta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.exerciseProgress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.exerciseProgressBar {
+  width: 80px;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.exerciseProgressFill {
+  height: 100%;
+  border-radius: 99px;
+  background: rgba(46, 204, 113, 0.7);
+  transition: width 0.4s ease;
+}
+
+/* PR cards */
+.prGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.prCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.prExercise {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.prWeight {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: rgba(46, 204, 113, 0.95);
+  line-height: 1.1;
+}
+
+.prVelocity {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.prDate {
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* Recent sessions */
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.sessionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sessionRow:last-child { border-bottom: none; }
+
+.sessionPrimary {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sessionSecondary {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.sessionVelocity {
+  text-align: right;
+}
+
+.sessionVelocityValue {
+  font-weight: 700;
+  font-size: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: rgba(96, 165, 250, 0.95);
+}
+
+.sessionVelocityLabel {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Trend chart */
+.chartContainer {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.chartTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.chartTab {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.chartTab:hover { background: rgba(255,255,255,0.06); }
+
+.chartTabActive {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: rgba(96, 165, 250, 0.95);
+}
+
+/* Position comparison */
+.comparisonRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparisonRow:last-child { border-bottom: none; }
+
+.comparisonExercise {
+  width: 120px;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.comparisonBarWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.comparisonBar {
+  height: 10px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.comparisonBarFill {
+  height: 100%;
+  border-radius: 99px;
+  background: rgba(96, 165, 250, 0.6);
+}
+
+.comparisonMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.comparisonPercentile {
+  width: 80px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.percentileHigh { color: rgba(46, 204, 113, 0.95); }
+.percentileMid { color: rgba(241, 196, 15, 0.95); }
+.percentileLow { color: rgba(231, 76, 60, 0.95); }
+
+/* Rest day card */
+.restCard {
+  text-align: center;
+  padding: 32px 18px;
+  border-color: rgba(46, 204, 113, 0.15);
+}
+
+.restIcon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+/* ── Template Builder ──────────────────────────────────────────────────── */
+
+.exerciseBlock {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: rgba(0,0,0,0.1);
+}
+
+.exerciseBlockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.setGroupRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── Team Dashboard ──────────────────────────────────────────────────── */
+
+/* Leaderboard table */
+.leaderboardTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboardTable th,
+.leaderboardTable td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.leaderboardTable th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.rankCell {
+  font-weight: 800;
+  font-size: 16px;
+  width: 48px;
+  text-align: center;
+}
+
+.rankGold { color: rgba(241, 196, 15, 0.95); }
+.rankSilver { color: rgba(192, 192, 192, 0.95); }
+.rankBronze { color: rgba(205, 127, 50, 0.95); }
+
+/* Live activity cards */
+.liveGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.liveCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.livePlayerName {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.livePlayerMeta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.liveExercise {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.liveWeight {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.liveReps {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.liveVelocity {
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: rgba(96, 165, 250, 0.95);
+  font-weight: 600;
+}
+
+.livePulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(46, 204, 113, 0.95);
+  margin-top: 4px;
+}
+
+.livePulse::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(46, 204, 113, 0.95);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Fullscreen display mode */
+.displayMode {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #060810;
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.displayModeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.displayModeTitle {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.displayModeCount {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.displayModeClose {
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.displayModeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.displayModeGrid .liveCard {
+  padding: 20px;
+}
+
+.displayModeGrid .livePlayerName {
+  font-size: 22px;
+}
+
+.displayModeGrid .liveWeight {
+  font-size: 32px;
+}
+
+.displayModeGrid .liveVelocity {
+  font-size: 20px;
+}
+
+/* Config / settings panel */
+.configPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.configSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.configSectionTitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.configCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.configCheckbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: rgba(96, 165, 250, 0.95);
+  cursor: pointer;
+}
+
+.configRadio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.configRadio input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: rgba(96, 165, 250, 0.95);
+  cursor: pointer;
+}
+
+.configRadioGroup {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Hub Layout ──────────────────────────────────────────────────────── */
+
+.hubNav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.hubTab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+}
+
+.hubTab:hover { background: rgba(255,255,255,0.06); }
+
+.hubTabActive {
+  background: rgba(96, 165, 250, 0.15);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: rgba(96, 165, 250, 0.95);
+}
+
+/* Player card sections */
+.playerCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+}
+
+/* Metric grid for editable inputs */
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.metricGridItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Calendar grid (6-column week view) */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.calendarDay {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0,0,0,0.08);
+}
+
+.calendarDayHeader {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.calendarCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Template list */
+.templateList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.templateCard {
+  cursor: default;
+  transition: border-color 0.15s ease;
+}
+
+.templateCard:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statsGrid { grid-template-columns: repeat(2, 1fr); }
+  .dashboardColumns { grid-template-columns: 1fr; }
+  .prGrid { grid-template-columns: repeat(2, 1fr); }
+  .teamGrid { grid-template-columns: 1fr; }
+  .liveGrid { grid-template-columns: 1fr; }
+  .displayModeGrid { grid-template-columns: 1fr; }
+  .calendarGrid { grid-template-columns: repeat(3, 1fr); }
+  .metricGrid { grid-template-columns: repeat(2, 1fr); }
+}
 

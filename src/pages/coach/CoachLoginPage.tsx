@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import logo from '../assets/trenchworks-logo.png'
+import { supabase } from '../../lib/supabase'
+import logo from '../../assets/trenchworks-logo.png'
 
-export default function Login() {
+export default function CoachLoginPage() {
   const nav = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

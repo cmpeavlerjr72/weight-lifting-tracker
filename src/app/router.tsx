@@ -1,24 +1,34 @@
 import type { ReactElement } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 
-import Login from '../pages/Login'
-import SetupTeam from '../pages/SetupTeam'
-import SetupRoster from '../pages/SetupRoster'
-import SetupRFID from '../pages/SetupRFID'
-import Dashboard from '../pages/Dashboard'
 import AuthGate from '../components/AuthGate'
 import AppShell from '../components/AppShell'
 
-import RoleSelect from "../pages/RoleSelect";
+// Auth / public
+import RoleSelectPage from '../pages/RoleSelectPage'
+import CoachLoginPage from '../pages/coach/CoachLoginPage'
+import PlayerLoginPage from '../pages/player/PlayerLoginPage'
 
+// Coach pages
+import CoachDashboardPage from '../pages/coach/CoachDashboardPage'
+import SetupTeamPage from '../pages/coach/SetupTeamPage'
+import SetupRosterPage from '../pages/coach/SetupRosterPage'
+import SetupRFIDPage from '../pages/coach/SetupRFIDPage'
+import WorkoutsPage from '../pages/coach/WorkoutsPage'
+import CoachTeamDashboardPage from '../pages/coach/CoachTeamDashboardPage'
+import VbtDataPage from '../pages/coach/VbtDataPage'
 
-// NEW: player pages
-import PlayerLoginPage from '../player/PlayerLoginPage'
-import PlayerClaimInvitePage from '../player/PlayerClaimInvitePage'
-import PlayerDashboardPage from '../player/PlayerDashboardPage'
+// Hub pages
+import HubRosterPage from '../pages/hub/HubRosterPage'
+import HubPlayerPage from '../pages/hub/HubPlayerPage'
+import HubProgramsPage from '../pages/hub/HubProgramsPage'
+import HubCalendarPage from '../pages/hub/HubCalendarPage'
 
-// NEW: player gate that works with element-style routes
-import { PlayerRouteGate } from '../player/PlayerRouteGate'
+// Player pages
+import PlayerClaimPage from '../pages/player/PlayerClaimPage'
+import PlayerDashboardPage from '../pages/player/PlayerDashboardPage'
+import PlayerTeamDashboardPage from '../pages/player/PlayerTeamDashboardPage'
+import { PlayerRouteGate } from '../pages/player/PlayerRouteGate'
 
 function Shell({ page }: { page: ReactElement }) {
   return (
@@ -29,31 +39,50 @@ function Shell({ page }: { page: ReactElement }) {
 }
 
 export const router = createBrowserRouter([
-  // Coach routes (existing)
-  { path: '/', element: <Shell page={<RoleSelect />} /> },
-  { path: '/coach/login', element: <Login /> },
-  { path: '/coach/setup/team', element: <Shell page={<SetupTeam />} /> },
-  { path: '/coach/setup/roster', element: <Shell page={<SetupRoster />} /> },
-  { path: '/coach/setup/rfid', element: <Shell page={<SetupRFID />} /> },
-  { path: '/coach/dashboard', element: <Shell page={<Dashboard />} /> },
-
-  // Player routes (NEW)
+  // Public
+  { path: '/', element: <RoleSelectPage /> },
+  { path: '/coach/login', element: <CoachLoginPage /> },
   { path: '/player/login', element: <PlayerLoginPage /> },
 
+  // Coach - no team context
+  { path: '/coach/dashboard', element: <Shell page={<CoachDashboardPage />} /> },
+  { path: '/coach/teams/new', element: <Shell page={<SetupTeamPage />} /> },
+
+  // Coach - team context (teamId in URL)
+  { path: '/coach/teams/:teamId/roster', element: <Shell page={<SetupRosterPage />} /> },
+  { path: '/coach/teams/:teamId/rfid', element: <Shell page={<SetupRFIDPage />} /> },
+  { path: '/coach/teams/:teamId/workouts', element: <Shell page={<WorkoutsPage />} /> },
+  { path: '/coach/teams/:teamId/team-dashboard', element: <Shell page={<CoachTeamDashboardPage />} /> },
+  { path: '/coach/teams/:teamId/vbt-data', element: <Shell page={<VbtDataPage />} /> },
+
+  // Hub
+  { path: '/coach/teams/:teamId/hub', element: <Shell page={<HubRosterPage />} /> },
+  { path: '/coach/teams/:teamId/hub/player/:playerId', element: <Shell page={<HubPlayerPage />} /> },
+  { path: '/coach/teams/:teamId/hub/programs', element: <Shell page={<HubProgramsPage />} /> },
+  { path: '/coach/teams/:teamId/hub/calendar', element: <Shell page={<HubCalendarPage />} /> },
+
+  // Player
   {
     path: '/player/claim',
     element: (
       <PlayerRouteGate mode="require-auth">
-        <PlayerClaimInvitePage />
+        <PlayerClaimPage />
       </PlayerRouteGate>
     ),
   },
-
   {
     path: '/player/dashboard',
     element: (
       <PlayerRouteGate mode="require-auth">
         <PlayerDashboardPage />
+      </PlayerRouteGate>
+    ),
+  },
+  {
+    path: '/player/team-dashboard',
+    element: (
+      <PlayerRouteGate mode="require-auth">
+        <PlayerTeamDashboardPage />
       </PlayerRouteGate>
     ),
   },
