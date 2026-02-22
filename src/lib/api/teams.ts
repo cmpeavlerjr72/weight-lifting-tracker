@@ -1,8 +1,9 @@
 import { authFetch } from './client'
 import type { Team } from '../../types/database'
 
-export async function listCoachTeams(): Promise<Team[]> {
-  const res = await authFetch('/teams')
+export async function listCoachTeams(includeArchived?: boolean): Promise<Team[]> {
+  const query = includeArchived ? '?include_archived=true' : ''
+  const res = await authFetch(`/teams${query}`)
   return res.json()
 }
 
@@ -24,10 +25,19 @@ export async function updateTeam(teamId: string, updates: {
   sport?: string
   dashboard_config?: Record<string, any>
   tracked_columns?: string[]
+  archived?: boolean
 }): Promise<Team> {
   const res = await authFetch(`/teams/${teamId}`, {
     method: 'PUT',
     body: JSON.stringify(updates),
   })
   return res.json()
+}
+
+export async function archiveTeam(teamId: string): Promise<Team> {
+  return updateTeam(teamId, { archived: true })
+}
+
+export async function unarchiveTeam(teamId: string): Promise<Team> {
+  return updateTeam(teamId, { archived: false })
 }

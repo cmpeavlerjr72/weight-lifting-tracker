@@ -18,8 +18,9 @@ export async function getCoachStats(): Promise<StatCard[]> {
   return res.json()
 }
 
-export async function getCoachTeamOverviews(): Promise<TeamOverview[]> {
-  const res = await authFetch('/coach/team-overviews')
+export async function getCoachTeamOverviews(includeArchived?: boolean): Promise<TeamOverview[]> {
+  const query = includeArchived ? '?include_archived=true' : ''
+  const res = await authFetch(`/coach/team-overviews${query}`)
   return res.json()
 }
 

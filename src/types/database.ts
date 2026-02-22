@@ -12,6 +12,7 @@ export type Team = {
   sport: string
   dashboard_config: Record<string, any>
   tracked_columns: string[]
+  archived: boolean
   created_at: string
 }
 

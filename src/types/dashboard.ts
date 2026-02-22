@@ -17,6 +17,7 @@ export type TeamOverview = {
   compliancePercent: number
   needsAttention: number
   workoutsThisWeek: number
+  archived?: boolean
 }
 
 export type ActivityItem = {

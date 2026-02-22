@@ -6,6 +6,7 @@ import {
   getCoachActivityFeed,
   getCoachDueWorkouts,
 } from '../../lib/api/dashboard'
+import { archiveTeam, unarchiveTeam } from '../../lib/api/teams'
 import type {
   StatCard,
   TeamOverview,
@@ -38,17 +39,19 @@ export default function CoachDashboardPage() {
   const [activity, setActivity] = useState<ActivityItem[]>([])
   const [dueWorkouts, setDueWorkouts] = useState<DueWorkout[]>([])
   const [loading, setLoading] = useState(true)
+  const [showArchived, setShowArchived] = useState(false)
+  const [kebabOpen, setKebabOpen] = useState<string | null>(null)
 
   useEffect(() => {
     loadDashboard()
-  }, [])
+  }, [showArchived])
 
   async function loadDashboard() {
     setLoading(true)
     try {
       const [s, t, a, d] = await Promise.all([
         getCoachStats(),
-        getCoachTeamOverviews(),
+        getCoachTeamOverviews(showArchived),
         getCoachActivityFeed(),
         getCoachDueWorkouts(),
       ])
@@ -61,6 +64,19 @@ export default function CoachDashboardPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleArchive(teamId: string, teamName: string) {
+    if (!window.confirm(`Archive "${teamName}"? It will be hidden from your dashboard but no data is deleted.`)) return
+    setKebabOpen(null)
+    await archiveTeam(teamId)
+    loadDashboard()
+  }
+
+  async function handleUnarchive(teamId: string) {
+    setKebabOpen(null)
+    await unarchiveTeam(teamId)
+    loadDashboard()
   }
 
   if (loading) {
@@ -100,7 +116,15 @@ export default function CoachDashboardPage() {
       </div>
 
       {/* Teams */}
-      <div className="sectionTitle">Your Teams</div>
+      <div className="row" style={{ alignItems: 'baseline' }}>
+        <div className="sectionTitle">Your Teams</div>
+        <button
+          className="archivedToggle"
+          onClick={() => setShowArchived(v => !v)}
+        >
+          {showArchived ? 'Hide archived' : 'Show archived'}
+        </button>
+      </div>
       {teams.length === 0 ? (
         <div className="card">
           <div className="small">No teams yet. Click <b>+ New Team</b> to get started.</div>
@@ -108,16 +132,49 @@ export default function CoachDashboardPage() {
       ) : (
         <div className="teamGrid">
           {teams.map(t => {
+            const isArchived = !!t.archived
             const pctClass = t.compliancePercent >= 70 ? '' : t.compliancePercent >= 40 ? 'progressFillWarn' : 'progressFillDanger'
             return (
               <div
                 key={t.id}
-                className="card teamCard"
+                className={`card teamCard ${isArchived ? 'teamCardArchived' : ''}`}
                 onClick={() => nav(`/coach/teams/${t.id}/roster`)}
               >
                 <div className="teamCardHeader">
                   <div className="teamCardName">{t.name}</div>
-                  <div className="teamCardSport">{t.sport}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="teamCardSport">{t.sport}</div>
+                    <div className="kebabWrap">
+                      <button
+                        className="kebabBtn"
+                        onClick={e => {
+                          e.stopPropagation()
+                          setKebabOpen(kebabOpen === t.id ? null : t.id)
+                        }}
+                      >
+                        &#8942;
+                      </button>
+                      {kebabOpen === t.id && (
+                        <div className="kebabMenu">
+                          {isArchived ? (
+                            <button
+                              className="kebabMenuItem"
+                              onClick={e => { e.stopPropagation(); handleUnarchive(t.id) }}
+                            >
+                              Unarchive
+                            </button>
+                          ) : (
+                            <button
+                              className="kebabMenuItem"
+                              onClick={e => { e.stopPropagation(); handleArchive(t.id, t.name) }}
+                            >
+                              Archive Team
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="teamCardStats">
