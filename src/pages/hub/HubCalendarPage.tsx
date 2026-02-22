@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { listTeamAssignments, listCoachTemplates, createAssignment, deleteAssignment } from '../../lib/api/workouts'
 import type { WorkoutAssignment, WorkoutTemplate, TargetType, PositionGroup } from '../../types/database'
 
@@ -39,6 +39,7 @@ function getMonthGrid(year: number, month: number): Date[] {
 
 export default function HubCalendarPage() {
   const { teamId } = useParams<{ teamId: string }>()
+  const navigate = useNavigate()
 
   const now = new Date()
   const [viewYear, setViewYear] = useState(now.getFullYear())
@@ -185,9 +186,21 @@ export default function HubCalendarPage() {
 
                     <div className="calMonthCellBody">
                       {dayAssignments.map(a => (
-                        <div key={a.id} className="calMonthEvent" onClick={() => handleRemoveAssignment(a.id)} title="Click to remove">
-                          <span style={{ fontWeight: 600 }}>{templateName(a.template_id)}</span>
-                          <span className="small" style={{ opacity: 0.7 }}>{targetLabel(a)}</span>
+                        <div key={a.id} className="calMonthEvent">
+                          <div
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate(`/coach/teams/${teamId}/hub/completion/${a.id}`)}
+                            title="View completion"
+                          >
+                            <span style={{ fontWeight: 600 }}>{templateName(a.template_id)}</span>
+                            <span className="small" style={{ opacity: 0.7 }}> {targetLabel(a)}</span>
+                          </div>
+                          <button
+                            className="button"
+                            onClick={(e) => { e.stopPropagation(); handleRemoveAssignment(a.id) }}
+                            title="Remove"
+                            style={{ padding: '1px 5px', fontSize: 10, lineHeight: 1 }}
+                          >&times;</button>
                         </div>
                       ))}
                     </div>

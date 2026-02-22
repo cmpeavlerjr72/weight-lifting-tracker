@@ -35,6 +35,7 @@ type DraftExercise = {
   customName: string
   setGroups: DraftSetGroup[]
   notes: string
+  trackingMode: 'vbt' | 'self_report'
 }
 
 type DraftTemplate = {
@@ -49,7 +50,7 @@ function emptySetGroup(): DraftSetGroup {
 }
 
 function emptyExercise(): DraftExercise {
-  return { exerciseName: EXERCISE_CATALOG[0], customName: '', setGroups: [emptySetGroup()], notes: '' }
+  return { exerciseName: EXERCISE_CATALOG[0], customName: '', setGroups: [emptySetGroup()], notes: '', trackingMode: 'vbt' }
 }
 
 function emptyDraft(): DraftTemplate {
@@ -72,6 +73,7 @@ function templateToDraft(t: WorkoutTemplate): DraftTemplate {
           value: String(sg.percentOfMax ?? sg.fixedWeight ?? ''),
         })),
         notes: ex.notes ?? '',
+        trackingMode: ex.trackingMode ?? (EXERCISE_CATALOG.includes(ex.exerciseName as any) ? 'vbt' : 'self_report'),
       })),
     }
   }
@@ -89,6 +91,7 @@ function templateToDraft(t: WorkoutTemplate): DraftTemplate {
         value: ex.targetWeight != null ? String(ex.targetWeight) : '',
       }],
       notes: '',
+      trackingMode: EXERCISE_CATALOG.includes(ex.name as any) ? 'vbt' as const : 'self_report' as const,
     })),
   }
 }
@@ -104,7 +107,7 @@ function draftToContent(draft: DraftTemplate): WorkoutContentV2 {
         else if (sg.mode === 'fixed' && sg.value) base.fixedWeight = Number(sg.value)
         return base
       })
-    return { exerciseName: name, setGroups, ...(ex.notes.trim() ? { notes: ex.notes.trim() } : {}) }
+    return { exerciseName: name, setGroups, trackingMode: ex.trackingMode, ...(ex.notes.trim() ? { notes: ex.notes.trim() } : {}) }
   })
   return { version: 2, exercises }
 }
@@ -315,10 +318,15 @@ export default function HubProgramsPage() {
                     <select
                       className="select"
                       value={ex.exerciseName}
-                      onChange={e => updateExercise(exIdx, {
-                        exerciseName: e.target.value,
-                        customName: e.target.value === '__custom__' ? ex.customName : '',
-                      })}
+                      onChange={e => {
+                        const val = e.target.value
+                        const isCatalog = val !== '__custom__' && EXERCISE_CATALOG.includes(val as any)
+                        updateExercise(exIdx, {
+                          exerciseName: val,
+                          customName: val === '__custom__' ? ex.customName : '',
+                          trackingMode: isCatalog ? 'vbt' : 'self_report',
+                        })
+                      }}
                       style={{ minWidth: 160 }}
                     >
                       {EXERCISE_CATALOG.map(name => (
@@ -335,6 +343,33 @@ export default function HubProgramsPage() {
                         style={{ maxWidth: 200 }}
                       />
                     )}
+                    <div style={{ display: 'inline-flex', borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)', fontSize: 12 }}>
+                      <button
+                        type="button"
+                        onClick={() => updateExercise(exIdx, { trackingMode: 'vbt' })}
+                        style={{
+                          padding: '4px 10px',
+                          background: ex.trackingMode === 'vbt' ? 'rgba(96,165,250,0.25)' : 'transparent',
+                          color: ex.trackingMode === 'vbt' ? 'rgba(96,165,250,1)' : 'inherit',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontWeight: ex.trackingMode === 'vbt' ? 700 : 400,
+                        }}
+                      >VBT</button>
+                      <button
+                        type="button"
+                        onClick={() => updateExercise(exIdx, { trackingMode: 'self_report' })}
+                        style={{
+                          padding: '4px 10px',
+                          background: ex.trackingMode === 'self_report' ? 'rgba(251,191,36,0.25)' : 'transparent',
+                          color: ex.trackingMode === 'self_report' ? 'rgba(251,191,36,1)' : 'inherit',
+                          border: 'none',
+                          borderLeft: '1px solid var(--border)',
+                          cursor: 'pointer',
+                          fontWeight: ex.trackingMode === 'self_report' ? 700 : 400,
+                        }}
+                      >Self-Report</button>
+                    </div>
                   </div>
                   <div className="row" style={{ gap: 6 }}>
                     <button className="button" onClick={() => moveExercise(exIdx, -1)} disabled={exIdx === 0} style={{ padding: '4px 8px' }}>&#9650;</button>

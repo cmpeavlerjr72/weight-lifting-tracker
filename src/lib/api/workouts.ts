@@ -5,6 +5,8 @@ import type {
   WorkoutContent,
   TargetType,
   PositionGroup,
+  ActiveWorkout,
+  PlayerProgress,
 } from '../../types/database'
 
 export async function listCoachTemplates(): Promise<WorkoutTemplate[]> {
@@ -83,4 +85,25 @@ export async function deleteTemplate(templateId: string): Promise<void> {
 
 export async function deleteAssignment(assignmentId: string): Promise<void> {
   await authFetch(`/assignments/${assignmentId}`, { method: 'DELETE' })
+}
+
+export async function getActiveWorkouts(playerId: string): Promise<ActiveWorkout[]> {
+  const res = await authFetch(`/players/${playerId}/active-workouts`)
+  return res.json()
+}
+
+export async function submitWorkoutLog(
+  playerId: string,
+  assignmentId: string,
+  exercises: { exercise_name: string; weight_lbs?: number; sets_completed: number; reps_per_set?: number; notes?: string }[],
+): Promise<void> {
+  await authFetch(`/players/${playerId}/workout-log/${assignmentId}`, {
+    method: 'PUT',
+    body: JSON.stringify(exercises),
+  })
+}
+
+export async function getAssignmentProgress(assignmentId: string): Promise<PlayerProgress[]> {
+  const res = await authFetch(`/assignments/${assignmentId}/progress`)
+  return res.json()
 }

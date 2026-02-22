@@ -52,6 +52,7 @@ export type TemplateExercise = {
   exerciseName: string
   setGroups: SetGroup[]
   notes?: string
+  trackingMode?: 'vbt' | 'self_report'
 }
 
 export type WorkoutContentV2 = {
@@ -105,6 +106,32 @@ export type ScanEvent = {
   uid: string
   device_id: string | null
   created_at: string
+}
+
+// ── Workout Logging / Completion ──
+
+export type ExerciseProgress = {
+  exercise_name: string
+  tracking_mode: 'vbt' | 'self_report'
+  sets_required: number
+  sets_completed: number
+  weight_lbs: number | null
+  reps_per_set: number | null
+}
+
+export type ActiveWorkout = {
+  assignment_id: string
+  template_name: string
+  due_at: string | null
+  exercises: ExerciseProgress[]
+}
+
+export type PlayerProgress = {
+  player_id: string
+  player_name: string
+  jersey_number: number | null
+  position_group: string
+  exercises: ExerciseProgress[]
 }
 
 // ── Player Maxes ──

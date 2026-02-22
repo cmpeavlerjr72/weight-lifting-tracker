@@ -23,6 +23,7 @@ import HubRosterPage from '../pages/hub/HubRosterPage'
 import HubPlayerPage from '../pages/hub/HubPlayerPage'
 import HubProgramsPage from '../pages/hub/HubProgramsPage'
 import HubCalendarPage from '../pages/hub/HubCalendarPage'
+import HubCompletionPage from '../pages/hub/HubCompletionPage'
 
 // Player pages
 import PlayerClaimPage from '../pages/player/PlayerClaimPage'
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
   { path: '/coach/teams/:teamId/hub/player/:playerId', element: <Shell page={<HubPlayerPage />} /> },
   { path: '/coach/teams/:teamId/hub/programs', element: <Shell page={<HubProgramsPage />} /> },
   { path: '/coach/teams/:teamId/hub/calendar', element: <Shell page={<HubCalendarPage />} /> },
+  { path: '/coach/teams/:teamId/hub/completion/:assignmentId', element: <Shell page={<HubCompletionPage />} /> },
 
   // Player
   {
