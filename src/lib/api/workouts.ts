@@ -80,3 +80,7 @@ export async function updateTemplate(
 export async function deleteTemplate(templateId: string): Promise<void> {
   await authFetch(`/templates/${templateId}`, { method: 'DELETE' })
 }
+
+export async function deleteAssignment(assignmentId: string): Promise<void> {
+  await authFetch(`/assignments/${assignmentId}`, { method: 'DELETE' })
+}

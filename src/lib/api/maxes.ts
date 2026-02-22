@@ -26,6 +26,16 @@ export async function listTeamMaxes(teamId: string): Promise<PlayerMax[]> {
   return res.json()
 }
 
+/** Fetch max history for a player, optionally filtered by exercise. */
+export async function listMaxHistory(
+  playerId: string,
+  exercise?: string,
+): Promise<PlayerMax[]> {
+  const params = exercise ? `?exercise=${encodeURIComponent(exercise)}` : ''
+  const res = await authFetch(`/players/${playerId}/maxes/history${params}`)
+  return res.json()
+}
+
 /** Delete a max record. */
 export async function deletePlayerMax(maxId: string): Promise<void> {
   await authFetch(`/maxes/${maxId}`, { method: 'DELETE' })

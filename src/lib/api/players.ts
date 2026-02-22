@@ -34,6 +34,11 @@ export async function updatePlayer(
   })
 }
 
+export async function getPlayer(playerId: string): Promise<Player> {
+  const res = await authFetch(`/players/${playerId}`)
+  return res.json()
+}
+
 export async function deletePlayer(playerId: string): Promise<void> {
   await authFetch(`/players/${playerId}`, { method: 'DELETE' })
 }

@@ -19,9 +19,15 @@ export async function createTeam(name: string, sport = 'football'): Promise<Team
   return res.json()
 }
 
-export async function updateTeam(teamId: string, updates: { name?: string }): Promise<void> {
-  await authFetch(`/teams/${teamId}`, {
+export async function updateTeam(teamId: string, updates: {
+  name?: string
+  sport?: string
+  dashboard_config?: Record<string, any>
+  tracked_columns?: string[]
+}): Promise<Team> {
+  const res = await authFetch(`/teams/${teamId}`, {
     method: 'PUT',
     body: JSON.stringify(updates),
   })
+  return res.json()
 }

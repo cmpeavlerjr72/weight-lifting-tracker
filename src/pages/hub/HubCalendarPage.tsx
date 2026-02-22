@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import HubLayout from './HubLayout'
-import { listTeamAssignments, listCoachTemplates, createAssignment } from '../../lib/api/workouts'
+import { listTeamAssignments, listCoachTemplates, createAssignment, deleteAssignment } from '../../lib/api/workouts'
 import type { WorkoutAssignment, WorkoutTemplate, TargetType, PositionGroup } from '../../types/database'
-import { authFetch } from '../../lib/api/client'
 
 function addDays(d: Date, n: number): Date {
   const r = new Date(d)
@@ -137,7 +135,7 @@ export default function HubCalendarPage() {
   async function handleRemoveAssignment(assignmentId: string) {
     if (!confirm('Remove this assignment?')) return
     try {
-      await authFetch(`/assignments/${assignmentId}`, { method: 'DELETE' })
+      await deleteAssignment(assignmentId)
       setAssignments(prev => prev.filter(a => a.id !== assignmentId))
     } catch (e: any) {
       setErr(e?.message ?? 'Failed to remove')
@@ -145,7 +143,7 @@ export default function HubCalendarPage() {
   }
 
   return (
-    <HubLayout>
+    <>
       <div className="card">
         <div className="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
           <div className="h1">{MONTH_NAMES[viewMonth]} {viewYear}</div>
@@ -234,6 +232,6 @@ export default function HubCalendarPage() {
           </>
         )}
       </div>
-    </HubLayout>
+    </>
   )
 }

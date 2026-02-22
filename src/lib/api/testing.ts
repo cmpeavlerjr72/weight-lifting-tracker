@@ -27,6 +27,16 @@ export async function listTeamTesting(teamId: string): Promise<PlayerTesting[]> 
   return res.json()
 }
 
+/** Fetch testing history for a player, optionally filtered by metric. */
+export async function listTestingHistory(
+  playerId: string,
+  metric?: string,
+): Promise<PlayerTesting[]> {
+  const params = metric ? `?metric=${encodeURIComponent(metric)}` : ''
+  const res = await authFetch(`/players/${playerId}/testing/history${params}`)
+  return res.json()
+}
+
 /** Delete a testing metric. */
 export async function deletePlayerTesting(testId: string): Promise<void> {
   await authFetch(`/testing/${testId}`, { method: 'DELETE' })

@@ -10,6 +10,8 @@ export type Team = {
   coach_id: string
   name: string
   sport: string
+  dashboard_config: Record<string, any>
+  tracked_columns: string[]
   created_at: string
 }
 

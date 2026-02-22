@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import HubLayout from './HubLayout'
 import {
   listCoachTemplates,
   createTemplate,
@@ -274,7 +273,7 @@ export default function HubProgramsPage() {
   }
 
   return (
-    <HubLayout>
+    <>
       <div className="card">
         <div className="row" style={{ alignItems: 'baseline', justifyContent: 'space-between' }}>
           <div className="h1">Programs</div>
@@ -486,6 +485,6 @@ export default function HubProgramsPage() {
           </div>
         )}
       </div>
-    </HubLayout>
+    </>
   )
 }

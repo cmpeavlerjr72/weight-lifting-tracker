@@ -1,4 +1,5 @@
 import { authFetch } from './client'
+import { getTeam, updateTeam } from './teams'
 import { supabase } from '../supabase'
 import type {
   LeaderboardEntry,
@@ -66,8 +67,6 @@ export function subscribeLiveActivity(
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
-const CONFIG_KEY = (teamId: string) => `team-dashboard-config-${teamId}`
-
 const DEFAULT_CONFIG: TeamDashboardConfig = {
   exercises: ['Back Squat', 'Bench Press', 'Power Clean', 'Hang Clean', 'Front Squat'],
   defaultMetric: 'peak_velocity',
@@ -79,13 +78,9 @@ const DEFAULT_CONFIG: TeamDashboardConfig = {
 export async function getTeamDashboardConfig(
   teamId: string,
 ): Promise<TeamDashboardConfig> {
-  // TODO: Replace with backend call when dashboard_config is stored in teams table
-  try {
-    const raw = localStorage.getItem(CONFIG_KEY(teamId))
-    if (raw) return JSON.parse(raw) as TeamDashboardConfig
-  } catch {
-    // ignore parse errors
-  }
+  const team = await getTeam(teamId)
+  const cfg = team.dashboard_config
+  if (cfg && (cfg as any).exercises) return cfg as unknown as TeamDashboardConfig
   return { ...DEFAULT_CONFIG }
 }
 
@@ -93,6 +88,5 @@ export async function saveTeamDashboardConfig(
   teamId: string,
   config: TeamDashboardConfig,
 ): Promise<void> {
-  // TODO: Replace with backend call
-  localStorage.setItem(CONFIG_KEY(teamId), JSON.stringify(config))
+  await updateTeam(teamId, { dashboard_config: config })
 }
