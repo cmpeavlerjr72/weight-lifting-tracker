@@ -138,7 +138,7 @@ export default function CoachDashboardPage() {
               <div
                 key={t.id}
                 className={`card teamCard ${isArchived ? 'teamCardArchived' : ''}`}
-                onClick={() => nav(`/coach/teams/${t.id}/roster`)}
+                onClick={() => nav(`/coach/teams/${t.id}`)}
               >
                 <div className="teamCardHeader">
                   <div className="teamCardName">{t.name}</div>

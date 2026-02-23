@@ -30,6 +30,12 @@ export type ActivityItem = {
   flagReason?: string
 }
 
+export type TeamOverviewDetail = {
+  team: TeamOverview
+  stats: StatCard[]
+  activity: ActivityItem[]
+}
+
 export type DueWorkout = {
   id: string
   templateName: string

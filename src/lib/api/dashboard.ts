@@ -2,6 +2,7 @@ import { authFetch } from './client'
 import type {
   StatCard,
   TeamOverview,
+  TeamOverviewDetail,
   ActivityItem,
   DueWorkout,
   PersonalRecord,
@@ -31,6 +32,11 @@ export async function getCoachActivityFeed(): Promise<ActivityItem[]> {
 
 export async function getCoachDueWorkouts(): Promise<DueWorkout[]> {
   const res = await authFetch('/coach/due-workouts')
+  return res.json()
+}
+
+export async function getTeamOverview(teamId: string): Promise<TeamOverviewDetail> {
+  const res = await authFetch(`/teams/${teamId}/overview`)
   return res.json()
 }
 

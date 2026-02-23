@@ -7,12 +7,20 @@ import {
   getTeamDashboardConfig,
   saveTeamDashboardConfig,
 } from '../lib/api/teamDashboard'
+import { getTeam, updateTeam } from '../lib/api/teams'
 import type {
   LeaderboardEntry,
   LivePlayerActivity,
   TeamDashboardConfig,
   PositionGroup,
 } from '../types/teamDashboard'
+
+function hexToRgb(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `${r}, ${g}, ${b}`
+}
 
 type Props = {
   role: 'coach' | 'player'
@@ -45,6 +53,12 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   // Config state
   const [config, setConfig] = useState<TeamDashboardConfig | null>(null)
   const [configSaving, setConfigSaving] = useState(false)
+
+  // Team color state
+  const [colorPrimary, setColorPrimary] = useState('#60a5fa')
+  const [colorSecondary, setColorSecondary] = useState('#f1c40f')
+  const [colorSaving, setColorSaving] = useState(false)
+  const [colorSavedMsg, setColorSavedMsg] = useState('')
 
   // ── Load leaderboard ──
   const loadLeaderboard = useCallback(async () => {
@@ -86,6 +100,11 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   useEffect(() => {
     if (tab !== 'settings') return
     getTeamDashboardConfig(teamId).then(setConfig)
+    getTeam(teamId).then(team => {
+      const colors = team.dashboard_config?.colors
+      if (colors?.primary) setColorPrimary(colors.primary)
+      if (colors?.secondary) setColorSecondary(colors.secondary)
+    }).catch(() => {})
   }, [teamId, tab])
 
   // ── ESC to close display mode ──
@@ -106,6 +125,34 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
       await saveTeamDashboardConfig(teamId, config)
     } finally {
       setConfigSaving(false)
+    }
+  }
+
+  function previewColor(which: 'primary' | 'secondary', hex: string) {
+    if (which === 'primary') {
+      setColorPrimary(hex)
+      document.documentElement.style.setProperty('--team-primary', hexToRgb(hex))
+    } else {
+      setColorSecondary(hex)
+      document.documentElement.style.setProperty('--team-secondary', hexToRgb(hex))
+    }
+  }
+
+  async function onSaveColors() {
+    setColorSaving(true)
+    setColorSavedMsg('')
+    try {
+      const team = await getTeam(teamId)
+      const existing = team.dashboard_config || {}
+      await updateTeam(teamId, {
+        dashboard_config: { ...existing, colors: { primary: colorPrimary, secondary: colorSecondary } },
+      })
+      setColorSavedMsg('Saved!')
+      setTimeout(() => setColorSavedMsg(''), 2000)
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setColorSaving(false)
     }
   }
 
@@ -341,6 +388,55 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
                     />
                     Show est. 1RM
                   </label>
+                </div>
+
+                {/* Team colors */}
+                <div className="configSection">
+                  <div className="configSectionTitle">Team Colors</div>
+                  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span className="small">Primary</span>
+                      <input
+                        type="color"
+                        value={colorPrimary}
+                        onChange={e => previewColor('primary', e.target.value)}
+                        style={{ width: 40, height: 32, border: 'none', background: 'none', cursor: 'pointer' }}
+                      />
+                      <div
+                        style={{
+                          width: 36, height: 20, borderRadius: 6,
+                          background: colorPrimary,
+                          border: '1px solid var(--border)',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span className="small">Secondary</span>
+                      <input
+                        type="color"
+                        value={colorSecondary}
+                        onChange={e => previewColor('secondary', e.target.value)}
+                        style={{ width: 40, height: 32, border: 'none', background: 'none', cursor: 'pointer' }}
+                      />
+                      <div
+                        style={{
+                          width: 36, height: 20, borderRadius: 6,
+                          background: colorSecondary,
+                          border: '1px solid var(--border)',
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                    <button
+                      className="button buttonPrimary"
+                      onClick={onSaveColors}
+                      disabled={colorSaving}
+                    >
+                      {colorSaving ? 'Saving...' : 'Save Colors'}
+                    </button>
+                    {colorSavedMsg && <span className="small" style={{ color: 'rgba(46, 204, 113, 0.95)' }}>{colorSavedMsg}</span>}
+                  </div>
                 </div>
 
                 <button

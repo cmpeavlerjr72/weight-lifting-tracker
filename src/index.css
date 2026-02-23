@@ -6,6 +6,8 @@
   --muted: #9aa3b2;
   --border: rgba(255,255,255,0.08);
   --accent: #ffffff;
+  --team-primary: 96, 165, 250;
+  --team-secondary: 241, 196, 15;
 }
 
 * { box-sizing: border-box; }
@@ -99,8 +101,8 @@ a { color: inherit; text-decoration: none; }
 
 .sidebarLinkActive {
   color: var(--text);
-  background: rgba(96, 165, 250, 0.08);
-  border-left-color: rgba(96, 165, 250, 0.7);
+  background: rgba(var(--team-primary), 0.08);
+  border-left-color: rgba(var(--team-primary), 0.7);
   font-weight: 600;
 }
 
@@ -141,7 +143,7 @@ a { color: inherit; text-decoration: none; }
 
   .sidebarLinkActive {
     border-left-color: transparent;
-    border-bottom-color: rgba(96, 165, 250, 0.7);
+    border-bottom-color: rgba(var(--team-primary), 0.7);
   }
 
   .appContent {
@@ -379,7 +381,7 @@ input {
 .colorGreen .statValue { color: rgba(46, 204, 113, 0.95); }
 .colorYellow .statValue { color: rgba(241, 196, 15, 0.95); }
 .colorRed .statValue { color: rgba(231, 76, 60, 0.95); }
-.colorBlue .statValue { color: rgba(96, 165, 250, 0.95); }
+.colorBlue .statValue { color: rgba(var(--team-primary), 0.95); }
 
 /* Team overview cards */
 .teamGrid {
@@ -631,9 +633,9 @@ input {
 }
 
 .dueBadgeUpcoming {
-  background: rgba(96, 165, 250, 0.12);
-  color: rgba(96, 165, 250, 0.95);
-  border: 1px solid rgba(96, 165, 250, 0.25);
+  background: rgba(var(--team-primary), 0.12);
+  color: rgba(var(--team-primary), 0.95);
+  border: 1px solid rgba(var(--team-primary), 0.25);
 }
 
 .dueBadgeOverdue {
@@ -654,8 +656,8 @@ input {
 
 /* Today's workout */
 .todayCard {
-  border-color: rgba(96, 165, 250, 0.25);
-  background: linear-gradient(180deg, rgba(96, 165, 250, 0.06), rgba(96, 165, 250, 0.01));
+  border-color: rgba(var(--team-primary), 0.25);
+  background: linear-gradient(180deg, rgba(var(--team-primary), 0.06), rgba(var(--team-primary), 0.01));
 }
 
 .todayTitle {
@@ -794,7 +796,7 @@ input {
   font-weight: 700;
   font-size: 16px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  color: rgba(96, 165, 250, 0.95);
+  color: rgba(var(--team-primary), 0.95);
 }
 
 .sessionVelocityLabel {
@@ -830,9 +832,9 @@ input {
 .chartTab:hover { background: rgba(255,255,255,0.06); }
 
 .chartTabActive {
-  background: rgba(96, 165, 250, 0.15);
-  border-color: rgba(96, 165, 250, 0.35);
-  color: rgba(96, 165, 250, 0.95);
+  background: rgba(var(--team-primary), 0.15);
+  border-color: rgba(var(--team-primary), 0.35);
+  color: rgba(var(--team-primary), 0.95);
 }
 
 /* Position comparison */
@@ -871,7 +873,7 @@ input {
 .comparisonBarFill {
   height: 100%;
   border-radius: 99px;
-  background: rgba(96, 165, 250, 0.6);
+  background: rgba(var(--team-primary), 0.6);
 }
 
 .comparisonMeta {
@@ -1012,7 +1014,7 @@ input {
 .liveVelocity {
   font-size: 14px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  color: rgba(96, 165, 250, 0.95);
+  color: rgba(var(--team-primary), 0.95);
   font-weight: 600;
 }
 
@@ -1133,7 +1135,7 @@ input {
 .configCheckbox input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: rgba(96, 165, 250, 0.95);
+  accent-color: rgba(var(--team-primary), 0.95);
   cursor: pointer;
 }
 
@@ -1148,7 +1150,7 @@ input {
 .configRadio input[type="radio"] {
   width: 16px;
   height: 16px;
-  accent-color: rgba(96, 165, 250, 0.95);
+  accent-color: rgba(var(--team-primary), 0.95);
   cursor: pointer;
 }
 
@@ -1182,9 +1184,9 @@ input {
 .hubTab:hover { background: rgba(255,255,255,0.06); }
 
 .hubTabActive {
-  background: rgba(96, 165, 250, 0.15);
-  border-color: rgba(96, 165, 250, 0.35);
-  color: rgba(96, 165, 250, 0.95);
+  background: rgba(var(--team-primary), 0.15);
+  border-color: rgba(var(--team-primary), 0.35);
+  color: rgba(var(--team-primary), 0.95);
 }
 
 /* Player card sections */
@@ -1262,7 +1264,7 @@ input {
 }
 
 .calMonthCellToday {
-  background: rgba(96, 165, 250, 0.06);
+  background: rgba(var(--team-primary), 0.06);
 }
 
 .calMonthCellHeader {
@@ -1272,7 +1274,7 @@ input {
 }
 
 .calMonthTodayBadge {
-  background: rgba(96, 165, 250, 0.8);
+  background: rgba(var(--team-primary), 0.8);
   color: #fff;
   border-radius: 50%;
   width: 24px;
@@ -1294,8 +1296,8 @@ input {
 .calMonthEvent {
   display: flex;
   flex-direction: column;
-  background: rgba(96, 165, 250, 0.12);
-  border: 1px solid rgba(96, 165, 250, 0.25);
+  background: rgba(var(--team-primary), 0.12);
+  border: 1px solid rgba(var(--team-primary), 0.25);
   border-radius: 6px;
   padding: 3px 6px;
   font-size: 11px;
@@ -1407,9 +1409,9 @@ input {
 }
 
 .colPickerChipActive {
-  background: rgba(96, 165, 250, 0.15);
-  border-color: rgba(96, 165, 250, 0.4);
-  color: rgba(96, 165, 250, 0.95);
+  background: rgba(var(--team-primary), 0.15);
+  border-color: rgba(var(--team-primary), 0.4);
+  color: rgba(var(--team-primary), 0.95);
 }
 
 /* Responsive */

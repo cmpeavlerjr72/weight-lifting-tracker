@@ -88,5 +88,7 @@ export async function saveTeamDashboardConfig(
   teamId: string,
   config: TeamDashboardConfig,
 ): Promise<void> {
-  await updateTeam(teamId, { dashboard_config: config })
+  const team = await getTeam(teamId)
+  const existing = team.dashboard_config || {}
+  await updateTeam(teamId, { dashboard_config: { ...existing, ...config } })
 }
