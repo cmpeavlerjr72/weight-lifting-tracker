@@ -16,6 +16,7 @@ import SetupRosterPage from '../pages/coach/SetupRosterPage'
 import SetupRFIDPage from '../pages/coach/SetupRFIDPage'
 import WorkoutsPage from '../pages/coach/WorkoutsPage'
 import CoachTeamDashboardPage from '../pages/coach/CoachTeamDashboardPage'
+import CoachProfilePage from '../pages/coach/CoachProfilePage'
 import VbtDataPage from '../pages/coach/VbtDataPage'
 import TeamOverviewPage from '../pages/coach/TeamOverviewPage'
 
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
 
   // Coach - no team context
   { path: '/coach/dashboard', element: <Shell page={<CoachDashboardPage />} /> },
+  { path: '/coach/profile', element: <Shell page={<CoachProfilePage />} /> },
   { path: '/coach/teams/new', element: <Shell page={<SetupTeamPage />} /> },
 
   // Coach - team context (teamId in URL)

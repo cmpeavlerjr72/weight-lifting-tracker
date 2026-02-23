@@ -39,6 +39,7 @@ export default function CoachDashboardPage() {
   const [activity, setActivity] = useState<ActivityItem[]>([])
   const [dueWorkouts, setDueWorkouts] = useState<DueWorkout[]>([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
   const [kebabOpen, setKebabOpen] = useState<string | null>(null)
 
@@ -48,22 +49,21 @@ export default function CoachDashboardPage() {
 
   async function loadDashboard() {
     setLoading(true)
-    try {
-      const [s, t, a, d] = await Promise.all([
-        getCoachStats(),
-        getCoachTeamOverviews(showArchived),
-        getCoachActivityFeed(),
-        getCoachDueWorkouts(),
-      ])
-      setStats(s)
-      setTeams(t)
-      setActivity(a)
-      setDueWorkouts(d)
-    } catch (err: any) {
-      alert(err.message)
-    } finally {
-      setLoading(false)
-    }
+    setFetchError(false)
+    let hadError = false
+    const fail = <T,>(fallback: T[]) => () => { hadError = true; return fallback as T[] }
+    const [s, t, a, d] = await Promise.all([
+      getCoachStats().catch(fail<StatCard>([])),
+      getCoachTeamOverviews(showArchived).catch(fail<TeamOverview>([])),
+      getCoachActivityFeed().catch(fail<ActivityItem>([])),
+      getCoachDueWorkouts().catch(fail<DueWorkout>([])),
+    ])
+    setStats(s)
+    setTeams(t)
+    setActivity(a)
+    setDueWorkouts(d)
+    setFetchError(hadError)
+    setLoading(false)
   }
 
   async function handleArchive(teamId: string, teamName: string) {
@@ -99,6 +99,15 @@ export default function CoachDashboardPage() {
           </div>
         </div>
       </div>
+
+      {fetchError && (
+        <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span className="small" style={{ color: 'rgba(241, 196, 15, 0.95)' }}>
+            Some data failed to load. The server may be waking up.
+          </span>
+          <button className="button" onClick={loadDashboard}>Retry</button>
+        </div>
+      )}
 
       {/* Stats row */}
       <div className="statsGrid">

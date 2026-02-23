@@ -11,6 +11,35 @@ function hexToRgb(hex: string): string {
   return `${r}, ${g}, ${b}`
 }
 
+function hexToHsl(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  let h = 0, s = 0
+  const l = (max + min) / 2
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    else if (max === g) h = ((b - r) / d + 2) / 6
+    else h = ((r - g) / d + 4) / 6
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)]
+}
+
+function generateTeamTheme(primaryHex: string) {
+  const [h, s] = hexToHsl(primaryHex)
+  const bs = Math.min(s, 55)
+  return {
+    bg:     `hsl(${h}, ${bs}%, 11%)`,
+    card:   `hsl(${h}, ${bs}%, 15%)`,
+    card2:  `hsl(${h}, ${bs}%, 13%)`,
+    border: `hsla(${h}, ${Math.min(s, 40)}%, 55%, 0.15)`,
+    muted:  `hsl(${h}, 15%, 62%)`,
+  }
+}
+
 const CUSTOM_LINKS = [
   { label: 'Overview', path: '' },
   { label: 'VBT Data', path: 'vbt-data' },
@@ -38,15 +67,22 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const activeSection: 'custom' | 'industry' = isIndustry ? 'industry' : 'custom'
   const sidebarLinks = activeSection === 'industry' ? INDUSTRY_LINKS : CUSTOM_LINKS
 
-  // Apply team colors when viewing a team
+  // Apply full team theme when viewing a team
   useEffect(() => {
     if (!teamId) return
     let cancelled = false
+    const themeProps = ['--team-primary', '--team-secondary', '--bg', '--card', '--card2', '--border', '--muted']
     getTeam(teamId).then(team => {
       if (cancelled) return
       const colors = team.dashboard_config?.colors
       if (colors?.primary) {
         document.documentElement.style.setProperty('--team-primary', hexToRgb(colors.primary))
+        const theme = generateTeamTheme(colors.primary)
+        document.documentElement.style.setProperty('--bg', theme.bg)
+        document.documentElement.style.setProperty('--card', theme.card)
+        document.documentElement.style.setProperty('--card2', theme.card2)
+        document.documentElement.style.setProperty('--border', theme.border)
+        document.documentElement.style.setProperty('--muted', theme.muted)
       }
       if (colors?.secondary) {
         document.documentElement.style.setProperty('--team-secondary', hexToRgb(colors.secondary))
@@ -54,8 +90,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     }).catch(() => {})
     return () => {
       cancelled = true
-      document.documentElement.style.removeProperty('--team-primary')
-      document.documentElement.style.removeProperty('--team-secondary')
+      themeProps.forEach(p => document.documentElement.style.removeProperty(p))
     }
   }, [teamId])
 
@@ -89,6 +124,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
         <div className="right row" style={{ gap: 10, alignItems: 'center' }}>
           <Link className="button" to="/coach/dashboard">Dashboard</Link>
+          <Link className="button" to="/coach/profile">Profile</Link>
 
           {teamId && (
             <div className="sectionTabs">

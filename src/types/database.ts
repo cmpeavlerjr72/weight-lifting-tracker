@@ -135,6 +135,29 @@ export type PlayerProgress = {
   exercises: ExerciseProgress[]
 }
 
+// ── Profiles ──
+
+export type Profile = {
+  id: string
+  email: string | null
+  display_name: string | null
+  role: string
+  coach_code: string | null
+  created_at: string
+}
+
+// ── Team Coaches ──
+
+export type TeamCoach = {
+  id: string
+  team_id: string
+  coach_id: string
+  role: 'head' | 'assistant'
+  display_name: string | null
+  email: string | null
+  added_at: string
+}
+
 // ── Player Maxes ──
 
 export type PlayerMax = {
