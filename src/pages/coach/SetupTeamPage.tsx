@@ -19,7 +19,7 @@ export default function SetupTeamPage() {
       await updateTeam(team.id, {
         dashboard_config: { colors: { primary, secondary } },
       })
-      nav(`/coach/teams/${team.id}/roster`)
+      nav(`/coach/teams/${team.id}/hub`)
     } catch (err: any) {
       alert(err.message)
     } finally {

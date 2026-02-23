@@ -45,6 +45,9 @@ export default function HubPlayerPage() {
   const [customUnit, setCustomUnit] = useState('s')
   const [customValue, setCustomValue] = useState('')
 
+  // Invite code copy
+  const [copiedCode, setCopiedCode] = useState(false)
+
   // History
   const [historyKey, setHistoryKey] = useState<string | null>(null) // "max:Exercise" or "test:Metric"
   const [historyRows, setHistoryRows] = useState<Array<{ value: number; tested_at: string }>>([])
@@ -123,6 +126,17 @@ export default function HubPlayerPage() {
   }
 
   useEffect(() => { loadAll() }, [playerId, teamId])
+
+  async function copyInviteCode() {
+    if (!player?.invite_code) return
+    try {
+      await navigator.clipboard.writeText(player.invite_code)
+      setCopiedCode(true)
+      window.setTimeout(() => setCopiedCode(false), 900)
+    } catch {
+      alert('Copy failed - you can manually select and copy.')
+    }
+  }
 
   async function handleSaveInfo() {
     if (!playerId) return
@@ -475,6 +489,43 @@ export default function HubPlayerPage() {
               </div>
             </div>
           )}
+
+          {/* Invite Code & RFID Status */}
+          <div className="divider" />
+          <div className="row" style={{ gap: 24, flexWrap: 'wrap' }}>
+            <div className="col" style={{ gap: 4 }}>
+              <label className="small" style={{ opacity: 0.7 }}>Invite Code</label>
+              <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+                <div
+                  className={`pill pillClickable ${player.linked_user_id ? 'pillSuccess' : 'pillNeutral'} pillCode`}
+                  title="Click to copy invite code"
+                  onClick={copyInviteCode}
+                  style={{ width: 'fit-content' }}
+                >
+                  <span className="pillCode">{player.invite_code ?? '...'}</span>
+                  {copiedCode
+                    ? <span style={{ opacity: 0.9 }}>Copied</span>
+                    : <span style={{ opacity: 0.75 }}>Copy</span>}
+                </div>
+                {player.linked_user_id && (
+                  <span className="small" style={{ color: '#2ecc71' }}>Account linked</span>
+                )}
+              </div>
+            </div>
+            <div className="col" style={{ gap: 4 }}>
+              <label className="small" style={{ opacity: 0.7 }}>RFID</label>
+              <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+                {player.rfid_tag_id ? (
+                  <>
+                    <span className="badge">Assigned</span>
+                    <span className="small mono" style={{ opacity: 0.7 }}>{player.rfid_tag_id}</span>
+                  </>
+                ) : (
+                  <span className="badge">Unassigned</span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Metrics — driven by column picker */}

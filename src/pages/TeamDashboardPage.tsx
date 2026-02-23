@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { EXERCISE_CATALOG, type CatalogExercise } from '../constants/exercises'
 import {
   getExerciseLeaderboard,
@@ -8,6 +8,10 @@ import {
   saveTeamDashboardConfig,
 } from '../lib/api/teamDashboard'
 import { getTeam, updateTeam } from '../lib/api/teams'
+import { listTeamPlayers } from '../lib/api/players'
+import { listTeamLeaderboardSets } from '../lib/api/vbt'
+import type { Player } from '../types/database'
+import type { VbtLeaderboardSet } from '../lib/api/vbt'
 import type {
   LeaderboardEntry,
   LivePlayerActivity,
@@ -56,7 +60,9 @@ type Props = {
   teamId: string
 }
 
-type Tab = 'leaderboards' | 'live' | 'settings'
+type Tab = 'leaderboards' | 'vbt_sets' | 'live' | 'settings'
+
+type VbtSortKey = 'player' | 'date' | 'reps' | 'avg_velocity' | 'peak_velocity' | 'avg_conc_accel' | 'avg_ecc_accel'
 
 const POSITION_FILTERS = ['all', 'Skill', 'Combo', 'Power'] as const
 const METRIC_OPTIONS = [
@@ -83,6 +89,14 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   const [config, setConfig] = useState<TeamDashboardConfig | null>(null)
   const [configSaving, setConfigSaving] = useState(false)
 
+  // VBT Sets leaderboard state
+  const [vbtPlayers, setVbtPlayers] = useState<Player[]>([])
+  const [allSets, setAllSets] = useState<VbtLeaderboardSet[]>([])
+  const [vbtLoading, setVbtLoading] = useState(false)
+  const [vbtExercise, setVbtExercise] = useState<string>('All')
+  const [vbtSortKey, setVbtSortKey] = useState<VbtSortKey>('peak_velocity')
+  const [vbtSortDir, setVbtSortDir] = useState<'asc' | 'desc'>('desc')
+
   // Team color state
   const [colorPrimary, setColorPrimary] = useState('#60a5fa')
   const [colorSecondary, setColorSecondary] = useState('#f1c40f')
@@ -105,6 +119,80 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   useEffect(() => {
     loadLeaderboard()
   }, [loadLeaderboard])
+
+  // ── Load VBT sets leaderboard ──
+  useEffect(() => {
+    setVbtLoading(true)
+    Promise.all([
+      listTeamLeaderboardSets(teamId, 200),
+      listTeamPlayers(teamId),
+    ])
+      .then(([sets, players]) => {
+        setAllSets(sets)
+        setVbtPlayers(players)
+      })
+      .catch(() => {})
+      .finally(() => setVbtLoading(false))
+  }, [teamId])
+
+  const vbtPlayerMap = useMemo(() => {
+    const m: Record<string, Player> = {}
+    for (const p of vbtPlayers) m[p.id] = p
+    return m
+  }, [vbtPlayers])
+
+  const vbtExercises = useMemo(() => {
+    const s = new Set(allSets.map(r => r.exercise))
+    return ['All', ...Array.from(s).sort()]
+  }, [allSets])
+
+  const vbtRows = useMemo(() => {
+    let rows = vbtExercise === 'All' ? allSets : allSets.filter(s => s.exercise === vbtExercise)
+    rows = [...rows].sort((a, b) => {
+      let av: number | string, bv: number | string
+      switch (vbtSortKey) {
+        case 'player': {
+          const pa = vbtPlayerMap[a.player_id]
+          const pb = vbtPlayerMap[b.player_id]
+          av = pa ? `${pa.last_name} ${pa.first_name}` : a.player_id
+          bv = pb ? `${pb.last_name} ${pb.first_name}` : b.player_id
+          return vbtSortDir === 'asc' ? (av as string).localeCompare(bv as string) : (bv as string).localeCompare(av as string)
+        }
+        case 'date':
+          av = new Date(a.created_at).getTime(); bv = new Date(b.created_at).getTime(); break
+        case 'reps':
+          av = a.rep_count; bv = b.rep_count; break
+        case 'avg_velocity':
+          av = a.avg_velocity; bv = b.avg_velocity; break
+        case 'peak_velocity':
+          av = a.peak_velocity; bv = b.peak_velocity; break
+        case 'avg_conc_accel':
+          av = a.avg_conc_accel ?? -Infinity; bv = b.avg_conc_accel ?? -Infinity; break
+        case 'avg_ecc_accel':
+          av = a.avg_ecc_accel ?? -Infinity; bv = b.avg_ecc_accel ?? -Infinity; break
+        default: return 0
+      }
+      return vbtSortDir === 'asc' ? (av as number) - (bv as number) : (bv as number) - (av as number)
+    })
+    return rows
+  }, [allSets, vbtExercise, vbtSortKey, vbtSortDir, vbtPlayerMap])
+
+  function toggleVbtSort(key: VbtSortKey) {
+    if (vbtSortKey === key) {
+      setVbtSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setVbtSortKey(key)
+      setVbtSortDir('desc')
+    }
+  }
+
+  function vbtSortIndicator(key: VbtSortKey) {
+    if (vbtSortKey !== key) return ''
+    return vbtSortDir === 'asc' ? ' \u25B2' : ' \u25BC'
+  }
+
+  const MPS_TO_FPS = 3.28084
+  const toFps = (v: number) => (v * MPS_TO_FPS).toFixed(2)
 
   // ── Load live activity ──
   useEffect(() => {
@@ -195,6 +283,7 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
   // ── Tabs ──
   const tabs: { key: Tab; label: string }[] = [
     { key: 'leaderboards', label: 'Leaderboards' },
+    { key: 'vbt_sets', label: 'VBT Sets' },
     { key: 'live', label: 'Live Weightroom' },
   ]
   if (role === 'coach') tabs.push({ key: 'settings', label: 'Settings' })
@@ -305,6 +394,95 @@ export default function TeamDashboardPage({ role, teamId }: Props) {
                         </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {/* ── VBT Sets Tab ── */}
+          {tab === 'vbt_sets' && (
+            <div className="card">
+              {/* Exercise filter pills */}
+              <div className="chartTabs" style={{ marginBottom: 12 }}>
+                {vbtExercises.map(ex => (
+                  <button
+                    key={ex}
+                    className={`chartTab ${vbtExercise === ex ? 'chartTabActive' : ''}`}
+                    onClick={() => setVbtExercise(ex)}
+                  >
+                    {ex}
+                  </button>
+                ))}
+              </div>
+
+              {vbtLoading ? (
+                <div className="small">Loading...</div>
+              ) : vbtRows.length === 0 ? (
+                <div className="small">No set data recorded yet.</div>
+              ) : (
+                <table className="leaderboardTable">
+                  <thead>
+                    <tr>
+                      <th style={{ width: 48 }}>#</th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('player')}>
+                        Player{vbtSortIndicator('player')}
+                      </th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('date')}>
+                        Date{vbtSortIndicator('date')}
+                      </th>
+                      {vbtExercise === 'All' && <th>Exercise</th>}
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('reps')}>
+                        Reps{vbtSortIndicator('reps')}
+                      </th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('avg_velocity')}>
+                        Avg Vel{vbtSortIndicator('avg_velocity')}
+                      </th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('peak_velocity')}>
+                        Peak Vel{vbtSortIndicator('peak_velocity')}
+                      </th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('avg_conc_accel')}>
+                        Conc Accel{vbtSortIndicator('avg_conc_accel')}
+                      </th>
+                      <th style={{ cursor: 'pointer', userSelect: 'none' }} onClick={() => toggleVbtSort('avg_ecc_accel')}>
+                        Ecc Accel{vbtSortIndicator('avg_ecc_accel')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vbtRows.map((s, i) => {
+                      const p = vbtPlayerMap[s.player_id]
+                      const name = p ? `${p.first_name} ${p.last_name}` : s.player_id
+                      const jersey = p?.jersey_number
+                      return (
+                        <tr key={s.id}>
+                          <td className={`rankCell ${i === 0 ? 'rankGold' : i === 1 ? 'rankSilver' : i === 2 ? 'rankBronze' : ''}`}>
+                            {i + 1}
+                          </td>
+                          <td style={{ fontWeight: 600 }}>
+                            {jersey != null && <span style={{ opacity: 0.5, marginRight: 6 }}>#{jersey}</span>}
+                            {name}
+                          </td>
+                          <td className="small">
+                            {new Date(s.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </td>
+                          {vbtExercise === 'All' && <td>{s.exercise}</td>}
+                          <td>{s.rep_count}</td>
+                          <td style={{ fontWeight: 700 }}>{toFps(s.avg_velocity)} ft/s</td>
+                          <td style={{ fontWeight: 700 }}>{toFps(s.peak_velocity)} ft/s</td>
+                          <td style={{ fontWeight: 700 }}>
+                            {s.avg_conc_accel != null
+                              ? `${(s.avg_conc_accel * MPS_TO_FPS).toFixed(2)} ft/s\u00B2`
+                              : '\u2014'}
+                          </td>
+                          <td style={{ fontWeight: 700 }}>
+                            {s.avg_ecc_accel != null
+                              ? `${(s.avg_ecc_accel * MPS_TO_FPS).toFixed(2)} ft/s\u00B2`
+                              : '\u2014'}
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               )}

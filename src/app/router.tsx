@@ -5,6 +5,7 @@ import AuthGate from '../components/AuthGate'
 import AppShell from '../components/AppShell'
 
 // Auth / public
+import WelcomePage from '../pages/WelcomePage'
 import RoleSelectPage from '../pages/RoleSelectPage'
 import CoachLoginPage from '../pages/coach/CoachLoginPage'
 import PlayerLoginPage from '../pages/player/PlayerLoginPage'
@@ -12,9 +13,6 @@ import PlayerLoginPage from '../pages/player/PlayerLoginPage'
 // Coach pages
 import CoachDashboardPage from '../pages/coach/CoachDashboardPage'
 import SetupTeamPage from '../pages/coach/SetupTeamPage'
-import SetupRosterPage from '../pages/coach/SetupRosterPage'
-import SetupRFIDPage from '../pages/coach/SetupRFIDPage'
-import WorkoutsPage from '../pages/coach/WorkoutsPage'
 import CoachTeamDashboardPage from '../pages/coach/CoachTeamDashboardPage'
 import CoachProfilePage from '../pages/coach/CoachProfilePage'
 import VbtDataPage from '../pages/coach/VbtDataPage'
@@ -43,7 +41,8 @@ function Shell({ page }: { page: ReactElement }) {
 
 export const router = createBrowserRouter([
   // Public
-  { path: '/', element: <RoleSelectPage /> },
+  { path: '/', element: <WelcomePage /> },
+  { path: '/get-started', element: <RoleSelectPage /> },
   { path: '/coach/login', element: <CoachLoginPage /> },
   { path: '/player/login', element: <PlayerLoginPage /> },
 
@@ -54,9 +53,6 @@ export const router = createBrowserRouter([
 
   // Coach - team context (teamId in URL)
   { path: '/coach/teams/:teamId', element: <Shell page={<TeamOverviewPage />} /> },
-  { path: '/coach/teams/:teamId/roster', element: <Shell page={<SetupRosterPage />} /> },
-  { path: '/coach/teams/:teamId/rfid', element: <Shell page={<SetupRFIDPage />} /> },
-  { path: '/coach/teams/:teamId/workouts', element: <Shell page={<WorkoutsPage />} /> },
   { path: '/coach/teams/:teamId/team-dashboard', element: <Shell page={<CoachTeamDashboardPage />} /> },
   { path: '/coach/teams/:teamId/vbt-data', element: <Shell page={<VbtDataPage />} /> },
 

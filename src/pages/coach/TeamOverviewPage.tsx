@@ -187,11 +187,11 @@ export default function TeamOverviewPage() {
 
       {/* Quick nav links */}
       <div className="row" style={{ gap: 8 }}>
-        <Link className="button" to={`${base}/vbt-data`}>VBT Data</Link>
-        <Link className="button" to={`${base}/workouts`}>Workouts</Link>
-        <Link className="button" to={`${base}/team-dashboard`}>Team Board</Link>
         <Link className="button" to={`${base}/hub`}>Roster</Link>
         <Link className="button" to={`${base}/hub/programs`}>Programs</Link>
+        <Link className="button" to={`${base}/hub/calendar`}>Calendar</Link>
+        <Link className="button" to={`${base}/vbt-data`}>VBT Data</Link>
+        <Link className="button" to={`${base}/team-dashboard`}>Team Board</Link>
       </div>
 
       {/* Activity + optional Settings column */}

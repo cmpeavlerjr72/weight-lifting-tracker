@@ -40,19 +40,13 @@ function generateTeamTheme(primaryHex: string) {
   }
 }
 
-const CUSTOM_LINKS = [
+const SIDEBAR_LINKS = [
   { label: 'Overview', path: '' },
-  { label: 'VBT Data', path: 'vbt-data' },
-  { label: 'Workouts', path: 'workouts' },
-  { label: 'Team Board', path: 'team-dashboard' },
-  { label: 'RFID', path: 'rfid' },
-  { label: 'Roster Setup', path: 'roster' },
-]
-
-const INDUSTRY_LINKS = [
   { label: 'Roster', path: 'hub' },
   { label: 'Programs', path: 'hub/programs' },
   { label: 'Calendar', path: 'hub/calendar' },
+  { label: 'VBT Data', path: 'vbt-data' },
+  { label: 'Team Board', path: 'team-dashboard' },
 ]
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -61,11 +55,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
 
   const base = teamId ? `/coach/teams/${teamId}` : ''
-
-  // Derive active section from URL
-  const isIndustry = location.pathname.includes('/hub')
-  const activeSection: 'custom' | 'industry' = isIndustry ? 'industry' : 'custom'
-  const sidebarLinks = activeSection === 'industry' ? INDUSTRY_LINKS : CUSTOM_LINKS
 
   // Apply full team theme when viewing a team
   useEffect(() => {
@@ -125,24 +114,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div className="right row" style={{ gap: 10, alignItems: 'center' }}>
           <Link className="button" to="/coach/dashboard">Dashboard</Link>
           <Link className="button" to="/coach/profile">Profile</Link>
-
-          {teamId && (
-            <div className="sectionTabs">
-              <Link
-                className={`sectionTab ${activeSection === 'custom' ? 'sectionTabActive' : ''}`}
-                to={`${base}/vbt-data`}
-              >
-                Custom
-              </Link>
-              <Link
-                className={`sectionTab ${activeSection === 'industry' ? 'sectionTabActive' : ''}`}
-                to={`${base}/hub`}
-              >
-                Industry
-              </Link>
-            </div>
-          )}
-
           <button className="button" onClick={logout}>Logout</button>
         </div>
       </div>
@@ -151,7 +122,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {teamId ? (
         <div className="appLayout">
           <nav className="sidebar">
-            {sidebarLinks.map(link => (
+            {SIDEBAR_LINKS.map(link => (
               <Link
                 key={link.label}
                 to={link.path === '' ? base : `${base}/${link.path}`}
