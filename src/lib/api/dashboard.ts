@@ -8,7 +8,6 @@ import type {
   PersonalRecord,
   WorkoutSession,
   TrendPoint,
-  TodayWorkout,
   PositionComparison,
 } from '../../types/dashboard'
 
@@ -41,11 +40,6 @@ export async function getTeamOverview(teamId: string): Promise<TeamOverviewDetai
 }
 
 // ─── Player Dashboard ───────────────────────────────────────────────────────
-
-export async function getPlayerTodayWorkout(playerId: string): Promise<TodayWorkout | null> {
-  const res = await authFetch(`/players/${playerId}/dashboard/today-workout`)
-  return res.json()
-}
 
 export async function getPlayerPRs(playerId: string): Promise<PersonalRecord[]> {
   const res = await authFetch(`/players/${playerId}/dashboard/prs`)

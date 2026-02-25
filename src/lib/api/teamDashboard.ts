@@ -25,21 +25,6 @@ export async function getExerciseLeaderboard(
   return res.json()
 }
 
-export async function getTeamRecordsByExercise(
-  teamId: string,
-): Promise<Record<string, LeaderboardEntry>> {
-  // Fetch leaderboard for each tracked exercise, take #1
-  const exercises = ['Back Squat', 'Bench Press', 'Power Clean', 'Hang Clean', 'Front Squat']
-  const result: Record<string, LeaderboardEntry> = {}
-  for (const exercise of exercises) {
-    const entries = await getExerciseLeaderboard(teamId, exercise, 'peak_velocity')
-    if (entries.length > 0) {
-      result[exercise] = entries[0]
-    }
-  }
-  return result
-}
-
 // ─── Live Activity ──────────────────────────────────────────────────────────
 
 export async function getTeamLiveActivity(

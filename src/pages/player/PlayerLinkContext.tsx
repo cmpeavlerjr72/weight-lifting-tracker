@@ -85,13 +85,17 @@ export function PlayerLinkProvider({ children }: { children: React.ReactNode }) 
       setAuthLoading(false)
     })()
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession)
-      setPlayerRow(null)
-      // Keep linkLoading true while we re-check the link so the route gate
-      // doesn't briefly see linked=false and redirect to /player/claim
-      if (newSession) setLinkLoading(true)
-      else clearPlayerLinkCache()
+      if (event === 'SIGNED_OUT' || !newSession) {
+        setPlayerRow(null)
+        clearPlayerLinkCache()
+      } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        // New/initial session — keep linkLoading true until loadLinkedPlayerRow
+        // completes so the route gate doesn't briefly redirect to /player/claim
+        setLinkLoading(true)
+      }
+      // TOKEN_REFRESHED / USER_UPDATED: just update session, keep playerRow intact
     })
 
     return () => {

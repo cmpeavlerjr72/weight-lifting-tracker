@@ -75,26 +75,6 @@ export type TrendPoint = {
   estimatedMax: number
 }
 
-export type TodaySetGroup = {
-  sets: number
-  reps: number
-  targetWeight: number | null
-  percentOfMax?: number
-  completedSets: number
-}
-
-export type TodayExercise = {
-  name: string
-  setGroups: TodaySetGroup[]
-  notes?: string
-}
-
-export type TodayWorkout = {
-  id: string
-  name: string
-  dueAt: string
-  exercises: TodayExercise[]
-}
 
 export type PositionComparison = {
   exercise: string
