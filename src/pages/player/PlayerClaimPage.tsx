@@ -78,7 +78,7 @@ export default function PlayerClaimPage() {
               value={code}
               onChange={e => setCode(e.target.value)}
               placeholder="AB12CD"
-              style={{ letterSpacing: 2, textTransform: 'uppercase' }}
+              style={{ letterSpacing: 2 }}
             />
           </label>
 

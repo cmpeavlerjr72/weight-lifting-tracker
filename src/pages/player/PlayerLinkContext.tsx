@@ -9,6 +9,8 @@ type LinkedPlayerRow = {
   team_id: string
   first_name: string
   last_name: string
+  jersey_number: number | null
+  position_group: string | null
   linked_user_id: string | null
   linked_at: string | null
   teams?: { name: string } | null
@@ -86,7 +88,10 @@ export function PlayerLinkProvider({ children }: { children: React.ReactNode }) 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession)
       setPlayerRow(null)
-      if (!newSession) clearPlayerLinkCache()
+      // Keep linkLoading true while we re-check the link so the route gate
+      // doesn't briefly see linked=false and redirect to /player/claim
+      if (newSession) setLinkLoading(true)
+      else clearPlayerLinkCache()
     })
 
     return () => {
@@ -108,6 +113,8 @@ export function PlayerLinkProvider({ children }: { children: React.ReactNode }) 
           team_id: cached.teamId,
           first_name: '',
           last_name: '',
+          jersey_number: null,
+          position_group: null,
           linked_user_id: uid,
           linked_at: null,
           teams: null,

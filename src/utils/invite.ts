@@ -1,5 +1,5 @@
 export function normalizeInviteCode(value: string): string {
-  return value.trim().toUpperCase()
+  return value.trim().toLowerCase()
 }
 
 export function classifyClaimError(message: string): 'invalid' | 'claimed' | 'unknown' {

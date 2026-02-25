@@ -28,7 +28,7 @@ export default function PlayerLoginPage() {
 
   async function signup() {
     setBusy(true)
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({ email, password, options: { data: { role: 'player' } } })
     setBusy(false)
     if (error) return alert(error.message)
     alert('Account created. If email confirmation is enabled, confirm first, then login.')

@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 
 import AuthGate from '../components/AuthGate'
 import AppShell from '../components/AppShell'
+import PlayerAppShell from '../components/PlayerAppShell'
 
 // Auth / public
 import WelcomePage from '../pages/WelcomePage'
@@ -28,7 +29,10 @@ import HubCompletionPage from '../pages/hub/HubCompletionPage'
 // Player pages
 import PlayerClaimPage from '../pages/player/PlayerClaimPage'
 import PlayerDashboardPage from '../pages/player/PlayerDashboardPage'
-import PlayerTeamDashboardPage from '../pages/player/PlayerTeamDashboardPage'
+import PlayerWorkoutsPage from '../pages/player/PlayerWorkoutsPage'
+import PlayerVbtDataPage from '../pages/player/PlayerVbtDataPage'
+import PlayerProfilePage from '../pages/player/PlayerProfilePage'
+import PlayerTeamBoardPage from '../pages/player/PlayerTeamBoardPage'
 import { PlayerRouteGate } from '../pages/player/PlayerRouteGate'
 
 function Shell({ page }: { page: ReactElement }) {
@@ -36,6 +40,14 @@ function Shell({ page }: { page: ReactElement }) {
     <AuthGate>
       <AppShell>{page}</AppShell>
     </AuthGate>
+  )
+}
+
+function PlayerShell({ page }: { page: ReactElement }) {
+  return (
+    <PlayerRouteGate mode="require-linked">
+      <PlayerAppShell>{page}</PlayerAppShell>
+    </PlayerRouteGate>
   )
 }
 
@@ -72,20 +84,9 @@ export const router = createBrowserRouter([
       </PlayerRouteGate>
     ),
   },
-  {
-    path: '/player/dashboard',
-    element: (
-      <PlayerRouteGate mode="require-auth">
-        <PlayerDashboardPage />
-      </PlayerRouteGate>
-    ),
-  },
-  {
-    path: '/player/team-dashboard',
-    element: (
-      <PlayerRouteGate mode="require-auth">
-        <PlayerTeamDashboardPage />
-      </PlayerRouteGate>
-    ),
-  },
+  { path: '/player/dashboard', element: <PlayerShell page={<PlayerDashboardPage />} /> },
+  { path: '/player/workouts', element: <PlayerShell page={<PlayerWorkoutsPage />} /> },
+  { path: '/player/vbt-data', element: <PlayerShell page={<PlayerVbtDataPage />} /> },
+  { path: '/player/team-board', element: <PlayerShell page={<PlayerTeamBoardPage />} /> },
+  { path: '/player/profile', element: <PlayerShell page={<PlayerProfilePage />} /> },
 ])
