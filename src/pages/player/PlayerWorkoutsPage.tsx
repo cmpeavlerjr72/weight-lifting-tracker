@@ -29,8 +29,11 @@ export default function PlayerWorkoutsPage() {
         for (const ex of w.exercises) {
           if (ex.tracking_mode === 'self_report') {
             const key = `${w.assignment_id}:${ex.exercise_name}`
+            // Pre-populate weight from first set group's target if no logged weight
+            const targetWeight = ex.set_groups?.[0]?.target_weight_lbs
             drafts[key] = {
-              weight: ex.weight_lbs != null ? String(ex.weight_lbs) : '',
+              weight: ex.weight_lbs != null ? String(ex.weight_lbs)
+                : targetWeight != null ? String(targetWeight) : '',
               sets: ex.sets_completed > 0 ? String(ex.sets_completed) : '',
               reps: ex.reps_per_set != null ? String(ex.reps_per_set) : '',
             }
@@ -157,6 +160,16 @@ export default function PlayerWorkoutsPage() {
 
                       {ex.tracking_mode === 'vbt' ? (
                         <div className="exerciseMeta" style={{ marginTop: 4 }}>
+                          {ex.set_groups && ex.set_groups.some(sg => sg.target_weight_lbs != null || sg.percent_of_max != null) ? (
+                            <div style={{ marginBottom: 2 }}>
+                              {ex.set_groups.map((sg, si) => {
+                                const parts: string[] = [`${sg.sets}\u00d7${sg.reps}`]
+                                if (sg.target_weight_lbs != null) parts.push(`@ ${sg.target_weight_lbs} lbs`)
+                                if (sg.percent_of_max != null) parts.push(`(${sg.percent_of_max}%)`)
+                                return <div key={si}>{parts.join(' ')}</div>
+                              })}
+                            </div>
+                          ) : null}
                           {ex.sets_completed} of {ex.sets_required} sets recorded via device
                         </div>
                       ) : draft ? (

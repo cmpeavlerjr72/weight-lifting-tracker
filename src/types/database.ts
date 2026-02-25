@@ -111,6 +111,13 @@ export type ScanEvent = {
 
 // ── Workout Logging / Completion ──
 
+export type SetGroupDetail = {
+  sets: number
+  reps: number
+  target_weight_lbs: number | null
+  percent_of_max: number | null
+}
+
 export type ExerciseProgress = {
   exercise_name: string
   tracking_mode: 'vbt' | 'self_report'
@@ -118,6 +125,7 @@ export type ExerciseProgress = {
   sets_completed: number
   weight_lbs: number | null
   reps_per_set: number | null
+  set_groups: SetGroupDetail[]
 }
 
 export type ActiveWorkout = {
