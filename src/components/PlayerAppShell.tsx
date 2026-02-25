@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { usePlayerLink } from '../pages/player/PlayerLinkContext'
-import { getTeam } from '../lib/api/teams'
+import { authFetch } from '../lib/api/client'
 import logo from '../assets/trenchworks-logo.png'
 
 function hexToHsl(hex: string): [number, number, number] {
@@ -52,13 +52,13 @@ export default function PlayerAppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
   const { teamId, linked, signOut } = usePlayerLink()
 
-  // Apply team theme
+  // Apply team theme via player-accessible endpoint
   useEffect(() => {
     if (!teamId) return
     let cancelled = false
     const themeProps = ['--team-primary', '--team-secondary', '--bg', '--card', '--card2', '--border', '--muted']
-    getTeam(teamId).then(team => {
-      if (cancelled) return
+    authFetch('/players/me/team').then(res => res.json()).then(team => {
+      if (cancelled || !team) return
       const colors = team.dashboard_config?.colors
       if (colors?.primary) {
         document.documentElement.style.setProperty('--team-primary', hexToRgb(colors.primary))
