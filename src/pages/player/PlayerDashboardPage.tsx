@@ -76,7 +76,7 @@ function VelocityChart({ points }: { points: TrendPoint[] }) {
 // ── Main Component ──────────────────────────────────────────────────────
 
 export default function PlayerDashboardPage() {
-  const { playerRow, playerId, linked, refreshLink, session } = usePlayerLink()
+  const { playerRow, playerId, linked, refreshLink } = usePlayerLink()
 
   // Claim form state (shown when not linked)
   const [inviteCode, setInviteCode] = useState('')
