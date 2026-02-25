@@ -90,12 +90,10 @@ export function PlayerLinkProvider({ children }: { children: React.ReactNode }) 
       if (event === 'SIGNED_OUT' || !newSession) {
         setPlayerRow(null)
         clearPlayerLinkCache()
-      } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        // New/initial session — keep linkLoading true until loadLinkedPlayerRow
-        // completes so the route gate doesn't briefly redirect to /player/claim
-        setLinkLoading(true)
       }
-      // TOKEN_REFRESHED / USER_UPDATED: just update session, keep playerRow intact
+      // All other events (TOKEN_REFRESHED, INITIAL_SESSION, SIGNED_IN):
+      // just update session. playerRow stays intact so linked doesn't flash.
+      // loadLinkedPlayerRow (triggered by session?.user?.id effect) handles linkLoading.
     })
 
     return () => {
