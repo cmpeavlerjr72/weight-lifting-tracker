@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { usePlayerLink } from './PlayerLinkContext'
+import { writePlayerLinkCache } from './playerStorage'
+import { normalizeInviteCode, classifyClaimError } from '../../utils/invite'
+import { authFetch } from '../../lib/api/client'
 import {
   getPlayerPRs,
   getPlayerRecentSessions,
@@ -73,8 +76,14 @@ function VelocityChart({ points }: { points: TrendPoint[] }) {
 // ── Main Component ──────────────────────────────────────────────────────
 
 export default function PlayerDashboardPage() {
-  const { playerRow, playerId } = usePlayerLink()
+  const { playerRow, playerId, linked, refreshLink, session } = usePlayerLink()
 
+  // Claim form state (shown when not linked)
+  const [inviteCode, setInviteCode] = useState('')
+  const [claimBusy, setClaimBusy] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
+
+  // Dashboard data (loaded when linked)
   const [activeWorkouts, setActiveWorkouts] = useState<ActiveWorkout[]>([])
   const [prs, setPrs] = useState<PersonalRecord[]>([])
   const [sessions, setSessions] = useState<WorkoutSession[]>([])
@@ -91,8 +100,37 @@ export default function PlayerDashboardPage() {
   }, [playerRow])
 
   useEffect(() => {
-    if (playerId) loadDashboard()
-  }, [playerId])
+    if (playerId && linked) loadDashboard()
+    else setLoading(false)
+  }, [playerId, linked])
+
+  async function handleClaim(e: React.FormEvent) {
+    e.preventDefault()
+    setClaimError(null)
+    const code = normalizeInviteCode(inviteCode)
+    if (!code || code.length < 6) return
+
+    setClaimBusy(true)
+    try {
+      const res = await authFetch('/players/claim', {
+        method: 'POST',
+        body: JSON.stringify({ invite_code: code }),
+      })
+      const data = await res.json()
+      const pid = data?.id as string | undefined
+      const tid = data?.team_id as string | undefined
+      if (pid && tid) writePlayerLinkCache({ playerId: pid, teamId: tid })
+      await refreshLink()
+    } catch (err: any) {
+      const msg = err?.message ?? ''
+      const kind = classifyClaimError(msg)
+      if (kind === 'invalid') setClaimError('Invalid invite code. Double-check and try again.')
+      else if (kind === 'claimed') setClaimError('That invite code has already been claimed.')
+      else setClaimError(msg || 'Could not claim invite.')
+    } finally {
+      setClaimBusy(false)
+    }
+  }
 
   async function loadDashboard() {
     if (!playerId) return
@@ -125,6 +163,54 @@ export default function PlayerDashboardPage() {
     return 'percentileLow'
   }
 
+  // ── Not linked: show claim form ────────────────────────────────────────
+  if (!linked) {
+    return (
+      <div className="dashboardStack">
+        <div className="card">
+          <div className="h1">Player Dashboard</div>
+          <div className="h2">Welcome! Link your roster spot to get started.</div>
+        </div>
+
+        <div className="card" style={{ maxWidth: 520 }}>
+          <div className="h2">Claim your roster spot</div>
+          <div className="small" style={{ marginBottom: 12, opacity: 0.8 }}>
+            Enter the invite code your coach gave you to link your account.
+          </div>
+
+          <form onSubmit={handleClaim} className="col" style={{ gap: 12 }}>
+            <label className="col" style={{ gap: 6 }}>
+              <span className="small">Invite code</span>
+              <input
+                className="input"
+                value={inviteCode}
+                onChange={e => setInviteCode(e.target.value)}
+                placeholder="ab12cd34"
+                style={{ letterSpacing: 2, maxWidth: 260 }}
+                disabled={claimBusy}
+              />
+            </label>
+
+            {claimError && (
+              <div style={{ padding: 10, borderRadius: 10, background: 'rgba(255,0,0,0.12)' }}>
+                {claimError}
+              </div>
+            )}
+
+            <button
+              className="button buttonPrimary"
+              type="submit"
+              disabled={claimBusy || normalizeInviteCode(inviteCode).length < 6}
+            >
+              {claimBusy ? 'Claiming...' : 'Claim invite'}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Linked: show dashboard ────────────────────────────────────────────
   if (loading) {
     return (
       <div className="dashboardStack">

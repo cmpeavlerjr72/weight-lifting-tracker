@@ -41,16 +41,16 @@ function generateTeamTheme(primaryHex: string) {
 }
 
 const SIDEBAR_LINKS = [
-  { label: 'Dashboard', path: '/player/dashboard' },
-  { label: 'Workouts',  path: '/player/workouts' },
-  { label: 'VBT Data',  path: '/player/vbt-data' },
-  { label: 'Team Board', path: '/player/team-board' },
+  { label: 'Dashboard', path: '/player/dashboard', requireLinked: false },
+  { label: 'Workouts',  path: '/player/workouts',  requireLinked: true },
+  { label: 'VBT Data',  path: '/player/vbt-data',  requireLinked: true },
+  { label: 'Team Board', path: '/player/team-board', requireLinked: true },
 ]
 
 export default function PlayerAppShell({ children }: { children: ReactNode }) {
   const nav = useNavigate()
   const location = useLocation()
-  const { teamId, signOut } = usePlayerLink()
+  const { teamId, linked, signOut } = usePlayerLink()
 
   // Apply team theme
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function PlayerAppShell({ children }: { children: ReactNode }) {
       {/* Body: Sidebar + Content */}
       <div className="appLayout">
         <nav className="sidebar">
-          {SIDEBAR_LINKS.map(link => (
+          {SIDEBAR_LINKS.filter(link => !link.requireLinked || linked).map(link => (
             <Link
               key={link.label}
               to={link.path}

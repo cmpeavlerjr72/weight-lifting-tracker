@@ -43,9 +43,9 @@ function Shell({ page }: { page: ReactElement }) {
   )
 }
 
-function PlayerShell({ page }: { page: ReactElement }) {
+function PlayerShell({ page, requireLinked = true }: { page: ReactElement; requireLinked?: boolean }) {
   return (
-    <PlayerRouteGate mode="require-linked">
+    <PlayerRouteGate mode={requireLinked ? 'require-linked' : 'require-auth'}>
       <PlayerAppShell>{page}</PlayerAppShell>
     </PlayerRouteGate>
   )
@@ -84,7 +84,7 @@ export const router = createBrowserRouter([
       </PlayerRouteGate>
     ),
   },
-  { path: '/player/dashboard', element: <PlayerShell page={<PlayerDashboardPage />} /> },
+  { path: '/player/dashboard', element: <PlayerShell page={<PlayerDashboardPage />} requireLinked={false} /> },
   { path: '/player/workouts', element: <PlayerShell page={<PlayerWorkoutsPage />} /> },
   { path: '/player/vbt-data', element: <PlayerShell page={<PlayerVbtDataPage />} /> },
   { path: '/player/team-board', element: <PlayerShell page={<PlayerTeamBoardPage />} /> },
