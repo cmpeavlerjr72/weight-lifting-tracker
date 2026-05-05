@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getMyProfile, updateMyProfile } from '../../lib/api/profiles'
+import { listMyDevices, pairDevice, unpairDevice, type Device } from '../../lib/api/devices'
 import type { Profile } from '../../types/database'
 
 export default function CoachProfilePage() {
@@ -10,8 +11,16 @@ export default function CoachProfilePage() {
   const [savedMsg, setSavedMsg] = useState('')
   const [copied, setCopied] = useState(false)
 
+  // Devices
+  const [devices, setDevices] = useState<Device[]>([])
+  const [deviceCode, setDeviceCode] = useState('')
+  const [deviceLabel, setDeviceLabel] = useState('')
+  const [pairing, setPairing] = useState(false)
+  const [pairError, setPairError] = useState('')
+
   useEffect(() => {
     load()
+    loadDevices()
   }, [])
 
   async function load() {
@@ -24,6 +33,45 @@ export default function CoachProfilePage() {
       alert(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadDevices() {
+    try {
+      setDevices(await listMyDevices())
+    } catch (err: any) {
+      // Non-fatal — coach may not have any devices yet
+      console.warn('listMyDevices failed', err)
+    }
+  }
+
+  async function handlePair() {
+    setPairError('')
+    const code = deviceCode.trim()
+    if (!code) {
+      setPairError('Enter the device code shown on screen')
+      return
+    }
+    setPairing(true)
+    try {
+      await pairDevice(code, deviceLabel.trim() || undefined)
+      setDeviceCode('')
+      setDeviceLabel('')
+      await loadDevices()
+    } catch (err: any) {
+      setPairError(err.message)
+    } finally {
+      setPairing(false)
+    }
+  }
+
+  async function handleUnpair(rowId: string) {
+    if (!confirm('Unpair this device?')) return
+    try {
+      await unpairDevice(rowId)
+      await loadDevices()
+    } catch (err: any) {
+      alert(err.message)
     }
   }
 
@@ -107,6 +155,73 @@ export default function CoachProfilePage() {
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
+      </div>
+
+      {/* Devices */}
+      <div className="card">
+        <div className="h2" style={{ marginBottom: 8 }}>VBT Devices</div>
+        <div className="small" style={{ marginBottom: 12 }}>
+          Pair an ESP32 unit by entering the code it shows on its screen at boot.
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+          <input
+            type="text"
+            className="input"
+            value={deviceCode}
+            onChange={e => setDeviceCode(e.target.value)}
+            placeholder="Device code (e.g. vbt-A4B2C9)"
+            style={{ flex: '1 1 220px', minWidth: 200 }}
+          />
+          <input
+            type="text"
+            className="input"
+            value={deviceLabel}
+            onChange={e => setDeviceLabel(e.target.value)}
+            placeholder="Label (optional)"
+            style={{ flex: '1 1 180px', minWidth: 160 }}
+          />
+          <button className="button buttonPrimary" onClick={handlePair} disabled={pairing}>
+            {pairing ? 'Pairing...' : 'Pair Device'}
+          </button>
+        </div>
+        {pairError && (
+          <div className="small" style={{ color: 'rgba(231, 76, 60, 0.95)', marginBottom: 8 }}>
+            {pairError}
+          </div>
+        )}
+
+        {devices.length === 0 ? (
+          <div className="small" style={{ opacity: 0.7 }}>No devices paired yet.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {devices.map(d => (
+              <div
+                key={d.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  padding: '10px 12px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                }}
+              >
+                <div>
+                  <div style={{ fontFamily: 'monospace', fontWeight: 600 }}>{d.device_id}</div>
+                  <div className="small" style={{ opacity: 0.75 }}>
+                    {d.label || 'No label'} · paired {new Date(d.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+                <button className="button" onClick={() => handleUnpair(d.id)}>
+                  Unpair
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Account Info */}
